@@ -18,15 +18,13 @@ import kaaes.spotify.webapi.android.models.Track;
 /**
  * Created by hardikarora on 6/3/15.
  */
-public class SpotifyTrackListAdapter extends ArrayAdapter<Track> {
+public class SpotifyTrackListAdapter extends ArrayAdapter<Object> {
 
-    private List<Track> artistTracks;
-    private int textViewResourceId;
+    private List<Object> artistTracks;
 
     public SpotifyTrackListAdapter(Context context, int resource, int textViewResourceId,
-                                   List<Track> artistTracks) {
+                                   List<Object> artistTracks) {
         super(context, resource, textViewResourceId, artistTracks);
-        this.textViewResourceId = textViewResourceId;
         this.artistTracks = artistTracks;
     }
 
@@ -44,7 +42,7 @@ public class SpotifyTrackListAdapter extends ArrayAdapter<Track> {
 
         }
 
-        Track track = artistTracks.get(position);
+        Track track = (Track) artistTracks.get(position);
 
 
         if(track != null){

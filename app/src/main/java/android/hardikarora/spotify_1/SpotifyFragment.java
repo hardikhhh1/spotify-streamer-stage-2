@@ -21,8 +21,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import kaaes.spotify.webapi.android.SpotifyApi;
-import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 import kaaes.spotify.webapi.android.models.Image;
@@ -33,13 +31,16 @@ import kaaes.spotify.webapi.android.models.Image;
  * Encapsulating the list retrieved by spotify and is displayed in a {@link android.widget.ListView}
  * layout.
  */
-public class SpotifyFragment extends Fragment{
+public class SpotifyFragment extends Fragment implements AsyncResponse{
 
     private static final String LOG_TAG = SpotifyFragment.class.getSimpleName();
     List<SpotifyArtist> artistList = new ArrayList<>();
     SpotifyListAdapter spotifyListAdapter;
+    FetchSpotifyData fetchSpotifyData;
 
     public SpotifyFragment() {
+        fetchSpotifyData = new FetchSpotifyData();
+        fetchSpotifyData.response = this;
         artistList = new ArrayList<>();
 
     }
@@ -58,6 +59,36 @@ public class SpotifyFragment extends Fragment{
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void afterExecution(List<Object> input) {
+        List<Object> artistObjList = input;
+        Log.d(LOG_TAG, "Total items : " + artistObjList.size());
+        spotifyListAdapter.clear();
+        artistList.clear();
+
+        if(artistObjList.size() == 0){
+            CharSequence noArtistText = "Couldn't find the artist/album.";
+            Toast toast = Toast.makeText(getActivity(), noArtistText, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        SpotifyArtist spotifyArtist ;
+        Artist artist;
+        for (Object artistObj : artistObjList) {
+            artist = (Artist) artistObj;
+            spotifyArtist = new SpotifyArtist(artist.name, artist.id);
+
+            List<Image> artistImagesList = artist.images;
+            //TODO : get the smallest image.
+            if(artistImagesList != null) {
+                if(artistImagesList.size() > 0) {
+                    spotifyArtist.setImage(artistImagesList.get(0));
+                }
+            }
+            artistList.add(spotifyArtist);
+        }
+        spotifyListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -84,48 +115,9 @@ public class SpotifyFragment extends Fragment{
                 if(searchString.equals("")){
                     return;
                 }
-                FetchSpotifyData spotifyData = new FetchSpotifyData();
 
-                try {
+                fetchSpotifyData.execute(searchString);
 
-                    ArtistsPager artistsPager = spotifyData.execute(searchString).get();
-
-                    Log.d(LOG_TAG, "Got artists after searching : " + artistsPager.artists.total);
-
-
-
-                    List<Artist> artistObjList = artistsPager.artists.items;
-                    Log.d(LOG_TAG, "Total items : " + artistObjList.size());
-                    spotifyListAdapter.clear();
-                    artistList.clear();
-
-                    if(artistObjList.size() == 0){
-                        CharSequence noArtistText = "Couldn't find the artist/album.";
-                        Toast toast = Toast.makeText(getActivity(), noArtistText, Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                    SpotifyArtist spotifyArtist ;
-                    for (Artist artist : artistObjList) {
-                        spotifyArtist = new SpotifyArtist(artist.name, artist.id);
-
-                        List<Image> artistImagesList = artist.images;
-                        //TODO : get the smallest image.
-                        if(artistImagesList != null) {
-                            if(artistImagesList.size() > 0) {
-                                spotifyArtist.setImage(artistImagesList.get(0));
-                            }
-                        }
-                        artistList.add(spotifyArtist);
-                    }
-                    spotifyListAdapter.notifyDataSetChanged();
-
-                } catch (Exception e){
-                    Log.e(LOG_TAG, "Error while getting the spotify data : " + e.getMessage());
-                    CharSequence errorText = "Error while getting the artists list, " +
-                            "Please try again later";
-                    Toast toast = Toast.makeText(getActivity(), errorText, Toast.LENGTH_SHORT);
-                    toast.show();
-                }
 
             }
 
@@ -151,24 +143,22 @@ public class SpotifyFragment extends Fragment{
     }
 
 
-    public class FetchSpotifyData extends AsyncTask<String, Void, ArtistsPager>{
+    public class FetchSpotifyData extends SpotifyAsyncTask{
 
         private final String LOG_TAG = FetchSpotifyData.class.getSimpleName();
 
         @Override
-        protected ArtistsPager doInBackground(String... params) {
-            ArtistsPager artists = null;
+        protected List<Artist> doInBackground(Object... params) {
+            ArtistsPager artists;
+            List<Artist> artistList = null;
             try {
-                artists = SpotifyApiUtil.searchArtists(params[0]);
+                artists = SpotifyApiUtil.searchArtists((String) params[0]);
+                artistList  = artists.artists.items;
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error while getting the spotify data in the task : " + e.getMessage());
-                CharSequence errorText = "Error while getting the artists list, " +
-                        "Please try again later";
-                Toast toast = Toast.makeText(getActivity(), errorText, Toast.LENGTH_SHORT);
-                toast.show();
             }
-            Log.d(LOG_TAG, "Got the spotify data in the task : " + artists.artists.items.size());
-            return artists;
+
+            return artistList;
         }
 
     }

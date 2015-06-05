@@ -2,6 +2,7 @@ package android.hardikarora.spotify_1;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,17 +15,14 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
-import kaaes.spotify.webapi.android.SpotifyApi;
-import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 
 
-public class ArtistTopTracksActivity extends Activity {
+public class ArtistTopTracksActivity extends Activity{
 
     private static final String LOG_TAG = ArtistTopTracksActivity.class.getSimpleName();
     private static String artistId;
@@ -32,6 +30,9 @@ public class ArtistTopTracksActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        fetchArtistTopTrackData.response = this;
+
         setContentView(R.layout.activity_artist_details);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
@@ -68,34 +69,39 @@ public class ArtistTopTracksActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
     /**
      * A placeholder fragment containing a simple view.
      */
-    public class PlaceholderFragment extends Fragment {
+    public class PlaceholderFragment extends Fragment implements AsyncResponse {
 
-        SpotifyTrackListAdapter spotifyTrackListAdapter;
+        FetchArtistTopTrackData fetchArtistTopTrackData = new FetchArtistTopTrackData();
+
 
         public PlaceholderFragment() {
+            fetchArtistTopTrackData.response = this;
         }
+
+
+        @Override
+        public void afterExecution(List<Object> input) {
+            SpotifyTrackListAdapter spotifyTrackListAdapter = new SpotifyTrackListAdapter(
+                    getActivity(), R.layout.list_item_spotify,
+                    R.id.spotify_item_textview, input);
+
+            ListView spotifyListView = (ListView) getActivity().findViewById(R.id.list_view_spotify2);
+            spotifyListView.setAdapter(spotifyTrackListAdapter);
+
+        }
+
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_artist_details, container, false);
-            FetchArtistTopTrackData topTrackTask = new FetchArtistTopTrackData();
             try {
-
-                List<Track> artistTopTracks = topTrackTask.execute(artistId).get();
-
-
-                spotifyTrackListAdapter = new SpotifyTrackListAdapter(
-                        rootView.getContext(), R.layout.list_item_spotify,
-                        R.id.spotify_item_textview, artistTopTracks
-                );
-
-                ListView spotifyListView = (ListView) rootView.findViewById(R.id.list_view_spotify2);
-                spotifyListView.setAdapter(spotifyTrackListAdapter );
-
+                fetchArtistTopTrackData.execute(artistId);
 
             } catch(Exception e){
                 Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.getMessage());
@@ -105,13 +111,12 @@ public class ArtistTopTracksActivity extends Activity {
         }
     }
 
-    public class FetchArtistTopTrackData extends AsyncTask<String, Void, List<Track>>{
-
+    public class FetchArtistTopTrackData extends SpotifyAsyncTask{
         @Override
-        protected List<Track> doInBackground(String... params) {
+        protected List<Track> doInBackground(Object[] params) {
             Tracks tracks;
             try {
-                tracks = SpotifyApiUtil.getArtistsTopTracks(params[0]);
+                tracks = SpotifyApiUtil.getArtistsTopTracks((String)params[0]);
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.getMessage());
                 return new ArrayList<>();
