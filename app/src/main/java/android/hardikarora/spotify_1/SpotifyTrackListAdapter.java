@@ -13,19 +13,21 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Image;
+import kaaes.spotify.webapi.android.models.Track;
 
 /**
  * Created by hardikarora on 6/3/15.
  */
-public class SpotifyListAdapter extends ArrayAdapter<SpotifyArtist> {
+public class SpotifyTrackListAdapter extends ArrayAdapter<Track> {
 
-    private List<SpotifyArtist> spotifyArtists;
+    private List<Track> artistTracks;
+    private int textViewResourceId;
 
-
-    public SpotifyListAdapter(Context context,int resource, int textViewResourceId,
-                              List<SpotifyArtist> spotifyArtists) {
-        super(context, resource, textViewResourceId, spotifyArtists);
-        this.spotifyArtists = spotifyArtists;
+    public SpotifyTrackListAdapter(Context context, int resource, int textViewResourceId,
+                                   List<Track> artistTracks) {
+        super(context, resource, textViewResourceId, artistTracks);
+        this.textViewResourceId = textViewResourceId;
+        this.artistTracks = artistTracks;
     }
 
 
@@ -42,15 +44,18 @@ public class SpotifyListAdapter extends ArrayAdapter<SpotifyArtist> {
 
         }
 
-        SpotifyArtist artist = spotifyArtists.get(position);
+        Track track = artistTracks.get(position);
 
-        if(artist != null){
-            TextView artistTextView = (TextView) view.findViewById(R.id.spotify_item_textview);
-            artistTextView.setText(artist.getArtistName());
-            Image image = artist.getImage();
+
+        if(track != null){
+            TextView trackTextView = (TextView) view.findViewById(R.id.spotify_item_textview);
+            trackTextView.setText(track.name);
+            Image image = track.album.images.get(0);
+            String imageUrl = image.url;
+
             ImageView imageView = (ImageView) view.findViewById(R.id.spotify_album_image);
-            if(image != null) {
-                Picasso.with(getContext()).load(image.url).into(imageView);
+            if(imageUrl != null) {
+                Picasso.with(getContext()).load(imageUrl).into(imageView);
             }
         }
         return view;

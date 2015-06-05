@@ -1,6 +1,7 @@
 package android.hardikarora.spotify_1;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -12,22 +13,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 import kaaes.spotify.webapi.android.models.Image;
-import kaaes.spotify.webapi.android.models.Pager;
 
 /**
  * Created by hardikarora on 6/2/15.
@@ -108,18 +106,11 @@ public class SpotifyFragment extends Fragment{
                     }
                     SpotifyArtist spotifyArtist ;
                     for (Artist artist : artistObjList) {
-                        spotifyArtist = new SpotifyArtist(artist.name);
+                        spotifyArtist = new SpotifyArtist(artist.name, artist.id);
 
                         List<Image> artistImagesList = artist.images;
-                        int index = 0;
-                        for(Image artistImage : artistImagesList) {
-                            index++;
-                            if (artistImage.width == 200) {
-                                spotifyArtist.setImage(artistImage);
-
-                            }
-
-                        }
+                        //TODO : get the smallest image.
+                        spotifyArtist.setImage(artistImagesList.get(0));
                         artistList.add(spotifyArtist);
                     }
                     spotifyListAdapter.notifyDataSetChanged();
@@ -142,6 +133,16 @@ public class SpotifyFragment extends Fragment{
 
         ListView spotifyListView = (ListView) rootView.findViewById(R.id.list_view_spotify);
         spotifyListView.setAdapter(spotifyListAdapter);
+        spotifyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SpotifyArtist artist = artistList.get(position);
+                String artistId = artist.getArtistId();
+                Intent intent = new Intent(getActivity(), ArtistTopTracksActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, artistId);
+                startActivity(intent);
+            }
+        });
         return rootView;
     }
 
@@ -158,8 +159,6 @@ public class SpotifyFragment extends Fragment{
                 SpotifyService spotifyService = spotifyApi.getService();
                 String artistName = params[0];
                 artists = spotifyService.searchArtists(artistName);
-//                Log.d(LOG_TAG, "No of artists recieved : " + artists.artists.total);
-
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error while getting the spotify data : " + e.getMessage());
                 CharSequence errorText = "Error while getting the artists list, " +
@@ -171,10 +170,6 @@ public class SpotifyFragment extends Fragment{
             return artists;
         }
 
-        @Override
-        protected void onPostExecute(ArtistsPager artistsPager) {
-            super.onPostExecute(artistsPager);
-        }
     }
 
 

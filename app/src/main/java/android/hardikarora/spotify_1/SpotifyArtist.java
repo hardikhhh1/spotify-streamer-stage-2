@@ -8,10 +8,12 @@ import kaaes.spotify.webapi.android.models.Image;
 public class SpotifyArtist {
 
     private Image image;
+    private String artistId;
     private String artistName;
 
-    public SpotifyArtist(String artistName) {
+    public SpotifyArtist(String artistName,  String artistId) {
         this.artistName = artistName;
+        this.artistId = artistId;
     }
 
     public SpotifyArtist(Image image, String artistName) {
@@ -34,5 +36,13 @@ public class SpotifyArtist {
 
     public void setArtistName(String artistName) {
         this.artistName = artistName;
+    }
+
+    public String getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(String artistId) {
+        this.artistId = artistId;
     }
 }
