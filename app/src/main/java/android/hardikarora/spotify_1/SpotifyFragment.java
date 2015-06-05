@@ -110,7 +110,11 @@ public class SpotifyFragment extends Fragment{
 
                         List<Image> artistImagesList = artist.images;
                         //TODO : get the smallest image.
-                        spotifyArtist.setImage(artistImagesList.get(0));
+                        if(artistImagesList != null) {
+                            if(artistImagesList.size() > 0) {
+                                spotifyArtist.setImage(artistImagesList.get(0));
+                            }
+                        }
                         artistList.add(spotifyArtist);
                     }
                     spotifyListAdapter.notifyDataSetChanged();
@@ -155,18 +159,15 @@ public class SpotifyFragment extends Fragment{
         protected ArtistsPager doInBackground(String... params) {
             ArtistsPager artists = null;
             try {
-                SpotifyApi spotifyApi = new SpotifyApi();
-                SpotifyService spotifyService = spotifyApi.getService();
-                String artistName = params[0];
-                artists = spotifyService.searchArtists(artistName);
+                artists = SpotifyApiUtil.searchArtists(params[0]);
             } catch (Exception e){
-                Log.e(LOG_TAG, "Error while getting the spotify data : " + e.getMessage());
+                Log.e(LOG_TAG, "Error while getting the spotify data in the task : " + e.getMessage());
                 CharSequence errorText = "Error while getting the artists list, " +
                         "Please try again later";
                 Toast toast = Toast.makeText(getActivity(), errorText, Toast.LENGTH_SHORT);
                 toast.show();
             }
-
+            Log.d(LOG_TAG, "Got the spotify data in the task : " + artists.artists.items.size());
             return artists;
         }
 

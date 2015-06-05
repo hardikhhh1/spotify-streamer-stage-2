@@ -109,14 +109,9 @@ public class ArtistTopTracksActivity extends Activity {
 
         @Override
         protected List<Track> doInBackground(String... params) {
-            SpotifyApi spotifyApi = new SpotifyApi();
-            SpotifyService service = spotifyApi.getService();
-            Log.d(LOG_TAG,"Getting the artist top tracks : " + params[0]);
             Tracks tracks;
-            Map<String, Object> apiOptions = new HashMap<>();
-            apiOptions.put("country", "US");
             try {
-                tracks = service.getArtistTopTrack(params[0], apiOptions);
+                tracks = SpotifyApiUtil.getArtistsTopTracks(params[0]);
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.getMessage());
                 return new ArrayList<>();
