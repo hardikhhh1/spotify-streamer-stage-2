@@ -1,10 +1,12 @@
-package android.hardikarora.spotify_1;
+package android.hardikarora.spotify_1.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
  * Created by hardikarora on 6/5/15.
+ *
+ * Class representing the spotify track model.
  */
 public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
 
@@ -20,9 +22,7 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
     }
 
     @Override
-    public int describeContents() {
-        return 0;
-    }
+    public int describeContents() { return 0; }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -34,39 +34,24 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
     private static Creator TrackCreator = new Creator() {
         @Override
         public SpotifyTrack createFromParcel(Parcel source) {
-            return new SpotifyTrack(source.readString(),
-                    source.readString(), source.readString());
+            return new SpotifyTrack(source.readString(), source.readString(),
+                    source.readString());
         }
 
         @Override
-        public SpotifyTrack[] newArray(int size) {
-            return new SpotifyTrack[size];
-        }
+        public SpotifyTrack[] newArray(int size) { return new SpotifyTrack[size]; }
     };
 
+    public String getAlbumName() { return albumName; }
 
+    public void setAlbumName(String albumName) { this.albumName = albumName; }
 
-    public String getAlbumName() {
-        return albumName;
-    }
+    public String getTrackName() { return trackName; }
 
-    public void setAlbumName(String albumName) {
-        this.albumName = albumName;
-    }
+    public void setTrackName(String trackName) { this.trackName = trackName; }
 
-    public String getTrackName() {
-        return trackName;
-    }
+    public String getImageUrl() { return imageUrl; }
 
-    public void setTrackName(String trackName) {
-        this.trackName = trackName;
-    }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 }

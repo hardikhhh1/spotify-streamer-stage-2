@@ -1,33 +1,28 @@
-package android.hardikarora.spotify_1;
+package android.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.hardikarora.spotify_1.R;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListView;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Track;
-import kaaes.spotify.webapi.android.models.Tracks;
 
 
+/*
+This class represents the activity to show the top tracks for
+an artist.
+ */
 public class ArtistTopTracksActivity extends Activity{
 
     private static final String LOG_TAG = ArtistTopTracksActivity.class.getSimpleName();
     private static String artistId;
 
+    /**
+     * Overriding the oncreate method, called when the view is created.
+     * Here the Fragment is initiated.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

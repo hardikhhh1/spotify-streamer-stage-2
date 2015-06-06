@@ -1,7 +1,13 @@
-package android.hardikarora.spotify_1;
+package android.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.hardikarora.spotify_1.util.AsyncResponse;
+import android.hardikarora.spotify_1.R;
+import android.hardikarora.spotify_1.util.SpotifyApiUtility;
+import android.hardikarora.spotify_1.util.SpotifyAsyncTask;
+import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import android.hardikarora.spotify_1.adapter.SpotifyTrackListAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -12,9 +18,6 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Track;
-import kaaes.spotify.webapi.android.models.Tracks;
 
 /**
  * Created by hardikarora on 6/6/15.
@@ -28,10 +31,10 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
 
     SpotifyTrackListAdapter spotifyTrackListAdapter;
     List<SpotifyTrackComponent> topTracks = new ArrayList<>();
-    FetchArtistTopTrackData fetchArtistTopTrackData = new FetchArtistTopTrackData();
+    FetchArtistTopTrackData fetchArtistTopTrackData = new FetchArtistTopTrackData(this);
 
     public TrackListFragment() {
-        fetchArtistTopTrackData.response = this;
+
     }
 
 
@@ -39,8 +42,7 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     @Override
     public void afterExecution(List<SpotifyTrackComponent> input) {
         topTracks = input;
-        fetchArtistTopTrackData = new FetchArtistTopTrackData();
-        fetchArtistTopTrackData.response = this;
+        fetchArtistTopTrackData = new FetchArtistTopTrackData(this);
         spotifyTrackListAdapter = new SpotifyTrackListAdapter(
                 getActivity(), R.layout.list_item_spotify,
                 R.id.spotify_item_textview, input);
@@ -66,7 +68,7 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        fetchArtistTopTrackData.response = this;
+        fetchArtistTopTrackData.callback = this;
         if(savedInstanceState == null){
             return;
         }
@@ -107,27 +109,21 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
         return rootView;
     }
 
-    public class FetchArtistTopTrackData extends SpotifyAsyncTask{
+    public class FetchArtistTopTrackData extends SpotifyAsyncTask {
+
+        public FetchArtistTopTrackData(AsyncResponse response) {
+            super(response);
+        }
+
         @Override
         protected List<SpotifyTrackComponent> doInBackground(Object[] params) {
-            Tracks tracks;
+            List<SpotifyTrackComponent> spotifyTracks;
+            String artistName = (String) params[0];
             try {
-                tracks = SpotifyApiUtil.getArtistsTopTracks((String)params[0]);
+                spotifyTracks = SpotifyApiUtility.getArtistsTopTracks(artistName);
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.getMessage());
                 return new ArrayList<>();
-            }
-            List<SpotifyTrackComponent> spotifyTracks = new ArrayList<>();
-            if(tracks == null)
-                return spotifyTracks;
-            if(tracks.tracks.size() > 0){
-                for(Track track : tracks.tracks){
-                    String albumName = track.album.name;
-                    String trackName = track.name;
-                    String imageUrl = track.album.images.get(0).url;
-                    spotifyTracks.add(new SpotifyTrack(albumName, trackName,
-                            imageUrl));
-                }
             }
             return spotifyTracks;
         }

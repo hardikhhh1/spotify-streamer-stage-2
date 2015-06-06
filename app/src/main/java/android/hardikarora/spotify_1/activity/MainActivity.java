@@ -1,6 +1,7 @@
-package android.hardikarora.spotify_1;
+package android.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
+import android.hardikarora.spotify_1.R;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
