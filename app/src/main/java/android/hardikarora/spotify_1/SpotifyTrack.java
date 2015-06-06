@@ -26,9 +26,9 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(albumName);
-        dest.writeString(trackName);
-        dest.writeString(imageUrl);
+        dest.writeString(this.albumName);
+        dest.writeString(this.trackName);
+        dest.writeString(this.imageUrl);
     }
 
     private static Creator TrackCreator = new Creator() {

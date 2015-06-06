@@ -38,10 +38,11 @@ public class SpotifyFragment extends Fragment implements AsyncResponse{
     List<SpotifyTrackComponent> artistList = new ArrayList<>();
     SpotifyListAdapter spotifyListAdapter;
     FetchSpotifyData fetchSpotifyData;
+    AsyncResponse fetchResponse = this;
 
     public SpotifyFragment() {
         fetchSpotifyData = new FetchSpotifyData();
-        fetchSpotifyData.response = this;
+        fetchSpotifyData.response = fetchResponse;
         artistList = new ArrayList<>();
 
     }
@@ -78,6 +79,7 @@ public class SpotifyFragment extends Fragment implements AsyncResponse{
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
+        fetchSpotifyData = new FetchSpotifyData();
         fetchSpotifyData.response = this;
         if(savedInstanceState == null){
             return;
@@ -108,6 +110,8 @@ public class SpotifyFragment extends Fragment implements AsyncResponse{
     public void afterExecution(List<SpotifyTrackComponent> input) {
         List<SpotifyTrackComponent> artistObjList = input;
         Log.d(LOG_TAG, "Total items : " + artistObjList.size());
+        fetchSpotifyData = new FetchSpotifyData();
+        fetchSpotifyData.response = this;
         spotifyListAdapter.clear();
         artistList.clear();
 
@@ -160,9 +164,9 @@ public class SpotifyFragment extends Fragment implements AsyncResponse{
                     return;
                 }
 
-                fetchSpotifyData.execute(searchString);
-
-
+                    fetchSpotifyData = new FetchSpotifyData();
+                    fetchSpotifyData.response = fetchResponse;
+                    fetchSpotifyData.execute(searchString);
             }
 
             @Override
