@@ -17,13 +17,13 @@ import kaaes.spotify.webapi.android.models.Image;
 /**
  * Created by hardikarora on 6/3/15.
  */
-public class SpotifyListAdapter extends ArrayAdapter<SpotifyArtist> {
+public class SpotifyListAdapter extends ArrayAdapter<SpotifyTrackComponent> {
 
-    private List<SpotifyArtist> spotifyArtists;
+    private List<SpotifyTrackComponent> spotifyArtists;
 
 
     public SpotifyListAdapter(Context context,int resource, int textViewResourceId,
-                              List<SpotifyArtist> spotifyArtists) {
+                              List<SpotifyTrackComponent> spotifyArtists) {
         super(context, resource, textViewResourceId, spotifyArtists);
         this.spotifyArtists = spotifyArtists;
     }
@@ -42,15 +42,15 @@ public class SpotifyListAdapter extends ArrayAdapter<SpotifyArtist> {
 
         }
 
-        SpotifyArtist artist = spotifyArtists.get(position);
+        SpotifyTrackComponent artist = spotifyArtists.get(position);
 
         if(artist != null){
             TextView artistTextView = (TextView) view.findViewById(R.id.spotify_item_textview);
             artistTextView.setText(artist.getArtistName());
-            Image image = artist.getImage();
+            String imageUrl = artist.getImageUrl();
             ImageView imageView = (ImageView) view.findViewById(R.id.spotify_album_image);
-            if(image != null) {
-                Picasso.with(getContext()).load(image.url).into(imageView);
+            if(imageUrl != null) {
+                Picasso.with(getContext()).load(imageUrl).into(imageView);
             }
         }
         return view;

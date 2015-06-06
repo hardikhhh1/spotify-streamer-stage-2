@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -34,7 +35,7 @@ import kaaes.spotify.webapi.android.models.Image;
 public class SpotifyFragment extends Fragment implements AsyncResponse{
 
     private static final String LOG_TAG = SpotifyFragment.class.getSimpleName();
-    List<SpotifyArtist> artistList = new ArrayList<>();
+    List<SpotifyTrackComponent> artistList = new ArrayList<>();
     SpotifyListAdapter spotifyListAdapter;
     FetchSpotifyData fetchSpotifyData;
 
@@ -62,8 +63,50 @@ public class SpotifyFragment extends Fragment implements AsyncResponse{
     }
 
     @Override
-    public void afterExecution(List<Object> input) {
-        List<Object> artistObjList = input;
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ArrayList<Parcelable> parcelableList = new ArrayList<>();
+        if(artistList != null){
+            if(artistList.size() > 0 ){
+                parcelableList =(ArrayList<Parcelable>) (ArrayList<?>) artistList;
+            }
+        }
+        outState.putParcelableArrayList("Artists", parcelableList);
+
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        fetchSpotifyData.response = this;
+        if(savedInstanceState == null){
+            return;
+        }
+        List<Parcelable> parcelableList;
+        parcelableList = savedInstanceState.getParcelableArrayList("Artists");
+        if(parcelableList == null){
+            return;
+        }
+        if(!(parcelableList.size() > 0)){
+            return;
+        }
+
+
+        List<SpotifyTrackComponent> componentList =
+                (List<SpotifyTrackComponent>)(List<?>) parcelableList;
+        if(parcelableList.size() > 0){
+            //TODO : send it to the adapter list.
+            spotifyListAdapter = new SpotifyListAdapter(
+                    getActivity(), R.layout.list_item_spotify,
+                    R.id.spotify_item_textview, componentList);
+        }
+
+    }
+
+
+    @Override
+    public void afterExecution(List<SpotifyTrackComponent> input) {
+        List<SpotifyTrackComponent> artistObjList = input;
         Log.d(LOG_TAG, "Total items : " + artistObjList.size());
         spotifyListAdapter.clear();
         artistList.clear();
@@ -73,23 +116,24 @@ public class SpotifyFragment extends Fragment implements AsyncResponse{
             Toast toast = Toast.makeText(getActivity(), noArtistText, Toast.LENGTH_SHORT);
             toast.show();
         }
-        SpotifyArtist spotifyArtist ;
+        SpotifyTrackComponent spotifyArtist ;
         Artist artist;
         for (Object artistObj : artistObjList) {
             artist = (Artist) artistObj;
-            spotifyArtist = new SpotifyArtist(artist.name, artist.id);
-
+            spotifyArtist = new SpotifyArtist(artist.id, artist.name );
             List<Image> artistImagesList = artist.images;
             //TODO : get the smallest image.
             if(artistImagesList != null) {
                 if(artistImagesList.size() > 0) {
-                    spotifyArtist.setImage(artistImagesList.get(0));
+                    spotifyArtist.setImageUrl(artistImagesList.get(0).url);
                 }
             }
             artistList.add(spotifyArtist);
         }
         spotifyListAdapter.notifyDataSetChanged();
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -132,7 +176,7 @@ public class SpotifyFragment extends Fragment implements AsyncResponse{
         spotifyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                SpotifyArtist artist = artistList.get(position);
+                SpotifyTrackComponent artist = artistList.get(position);
                 String artistId = artist.getArtistId();
                 Intent intent = new Intent(getActivity(), ArtistTopTracksActivity.class);
                 intent.putExtra(Intent.EXTRA_TEXT, artistId);

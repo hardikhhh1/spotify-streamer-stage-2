@@ -8,5 +8,5 @@ import java.util.List;
  * Created by harora on 6/5/15.
  */
 public interface AsyncResponse {
-        void afterExecution(List<Object> input);
+        void afterExecution(List<SpotifyTrackComponent> input);
 }

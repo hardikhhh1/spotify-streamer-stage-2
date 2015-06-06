@@ -16,10 +16,11 @@ public class SpotifyApiUtil {
     public static ArtistsPager searchArtists(String artistName){
         SpotifyApi spotifyApi = new SpotifyApi();
         SpotifyService spotifyService = spotifyApi.getService();
-        ArtistsPager artists = spotifyService.searchArtists(artistName);
+        Map<String, Object> apiOptions = new HashMap<>();
+        apiOptions.put("type", "artist");
+        ArtistsPager artists = spotifyService.searchArtists(artistName, apiOptions);
         return artists;
     }
-
 
     public static Tracks getArtistsTopTracks(String artistID){
         SpotifyApi spotifyApi = new SpotifyApi();

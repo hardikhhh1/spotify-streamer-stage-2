@@ -1,48 +1,48 @@
 package android.hardikarora.spotify_1;
 
-import kaaes.spotify.webapi.android.models.Image;
 
 /**
  * Created by hardikarora on 6/3/15.
  */
-public class SpotifyArtist {
+public class SpotifyArtist extends SpotifyTrackComponent {
 
-    private Image image;
+    private String imageUrl;
     private String artistId;
     private String artistName;
 
-    public SpotifyArtist(String artistName,  String artistId) {
-        this.artistName = artistName;
+    public SpotifyArtist(String artistId, String artistName) {
         this.artistId = artistId;
-    }
-
-    public SpotifyArtist(Image image, String artistName) {
-        this.image = image;
         this.artistName = artistName;
     }
 
-
-    public Image getImage() {
-        return image;
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
-    }
-
-    public String getArtistName() {
-        return artistName;
-    }
-
-    public void setArtistName(String artistName) {
-        this.artistName = artistName;
-    }
-
+    @Override
     public String getArtistId() {
-        return artistId;
+        return this.artistId;
     }
 
+    @Override
     public void setArtistId(String artistId) {
         this.artistId = artistId;
+    }
+
+    @Override
+    public String getArtistName() {
+        return this.artistName;
+    }
+
+    @Override
+    public void setArtistName(String artistName) {
+
+        this.artistName = artistName;
+    }
+
+    @Override
+    public String getImageUrl() {
+        return this.imageUrl;
+    }
+
+    @Override
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

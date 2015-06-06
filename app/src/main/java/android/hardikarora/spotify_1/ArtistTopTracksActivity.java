@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,22 +28,22 @@ public class ArtistTopTracksActivity extends Activity{
     private static final String LOG_TAG = ArtistTopTracksActivity.class.getSimpleName();
     private static String artistId;
 
+    static FetchArtistTopTrackData fetchArtistTopTrackData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        fetchArtistTopTrackData.response = this;
-
+        fetchArtistTopTrackData = new FetchArtistTopTrackData();
         setContentView(R.layout.activity_artist_details);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+
         Intent intent = getIntent();
         artistId = intent.getStringExtra(Intent.EXTRA_TEXT);
         Log.d(LOG_TAG, "Artist top tracks activity has started : " + artistId);
-
 
     }
 
@@ -74,19 +75,22 @@ public class ArtistTopTracksActivity extends Activity{
     /**
      * A placeholder fragment containing a simple view.
      */
-    public class PlaceholderFragment extends Fragment implements AsyncResponse {
+    public static class PlaceholderFragment extends Fragment implements AsyncResponse {
 
-        FetchArtistTopTrackData fetchArtistTopTrackData = new FetchArtistTopTrackData();
 
+        SpotifyTrackListAdapter spotifyTrackListAdapter;
+        List<SpotifyTrackComponent> topTracks = new ArrayList<>();
 
         public PlaceholderFragment() {
             fetchArtistTopTrackData.response = this;
         }
 
 
+
         @Override
-        public void afterExecution(List<Object> input) {
-            SpotifyTrackListAdapter spotifyTrackListAdapter = new SpotifyTrackListAdapter(
+        public void afterExecution(List<SpotifyTrackComponent> input) {
+            topTracks = input;
+            spotifyTrackListAdapter = new SpotifyTrackListAdapter(
                     getActivity(), R.layout.list_item_spotify,
                     R.id.spotify_item_textview, input);
 
@@ -95,6 +99,46 @@ public class ArtistTopTracksActivity extends Activity{
 
         }
 
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+            ArrayList<Parcelable> parcelableList = new ArrayList<>();
+            if(topTracks != null){
+                if(topTracks.size() > 0 ){
+                    parcelableList =(ArrayList<Parcelable>) (ArrayList<?>) topTracks;
+                }
+            }
+            outState.putParcelableArrayList("TopTracks", parcelableList);
+
+        }
+
+        @Override
+        public void onViewStateRestored(Bundle savedInstanceState) {
+            super.onViewStateRestored(savedInstanceState);
+            fetchArtistTopTrackData.response = this;
+            if(savedInstanceState == null){
+                return;
+            }
+            List<Parcelable> parcelableList;
+            parcelableList = savedInstanceState.getParcelableArrayList("TopTracks");
+            if(parcelableList == null){
+                return;
+            }
+            if(!(parcelableList.size() > 0)){
+                return;
+            }
+
+
+            List<SpotifyTrackComponent> componentList =
+                    (List<SpotifyTrackComponent>)(List<?>) parcelableList;
+            if(parcelableList.size() > 0){
+                //TODO : send it to the adapter list.
+                spotifyTrackListAdapter = new SpotifyTrackListAdapter(
+                        getActivity(), R.layout.list_item_spotify,
+                        R.id.spotify_item_textview, componentList);
+            }
+
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,7 +157,7 @@ public class ArtistTopTracksActivity extends Activity{
 
     public class FetchArtistTopTrackData extends SpotifyAsyncTask{
         @Override
-        protected List<Track> doInBackground(Object[] params) {
+        protected List<SpotifyTrackComponent> doInBackground(Object[] params) {
             Tracks tracks;
             try {
                 tracks = SpotifyApiUtil.getArtistsTopTracks((String)params[0]);
@@ -121,12 +165,19 @@ public class ArtistTopTracksActivity extends Activity{
                 Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.getMessage());
                 return new ArrayList<>();
             }
-            List<Track> tracksList = new ArrayList<>();
-            if(tracks != null) {
-                tracksList = tracks.tracks;
-                Log.d(LOG_TAG,"No of tracks are : " + tracksList.size());
+            List<SpotifyTrackComponent> spotifyTracks = new ArrayList<>();
+            if(tracks == null)
+                return spotifyTracks;
+            if(tracks.tracks.size() > 0){
+                for(Track track : tracks.tracks){
+                    String albumName = track.album.name;
+                    String trackName = track.name;
+                    String imageUrl = track.album.images.get(0).url;
+                    spotifyTracks.add(new SpotifyTrack(albumName, trackName,
+                            imageUrl));
+                }
             }
-            return tracksList;
+            return spotifyTracks;
         }
     }
 }

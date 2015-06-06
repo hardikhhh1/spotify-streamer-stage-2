@@ -14,7 +14,7 @@ public class SpotifyAsyncTask extends AsyncTask {
 
     @Override
     protected void onPostExecute(Object o) {
-        response.afterExecution((List<Object>) o);
+        response.afterExecution((List<SpotifyTrackComponent>) o);
     }
 
 
