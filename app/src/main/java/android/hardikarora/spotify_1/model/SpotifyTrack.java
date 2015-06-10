@@ -14,6 +14,7 @@ import kaaes.spotify.webapi.android.models.Track;
  */
 public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
 
+    public static final int DEFAULT_IMAGE_SIZE = 200;
 
     private String trackName;
     private String albumName;
@@ -39,7 +40,7 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
 
 
     public SpotifyTrack(Track spotifyTrack) {
-        this(spotifyTrack, 200);
+        this(spotifyTrack, DEFAULT_IMAGE_SIZE);
     }
 
     @Override

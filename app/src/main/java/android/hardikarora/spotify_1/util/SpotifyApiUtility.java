@@ -3,6 +3,7 @@ package android.hardikarora.spotify_1.util;
 import android.hardikarora.spotify_1.model.SpotifyArtist;
 import android.hardikarora.spotify_1.model.SpotifyTrack;
 import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,8 @@ import kaaes.spotify.webapi.android.models.Tracks;
  * Class which has methods that wrap arround the spotify api.
  */
 public class SpotifyApiUtility {
+
+    public static final String LOG_TAG = SpotifyApiUtility.class.getSimpleName();
 
     private static final String TYPE_TOKEN = "type";
     private static final String ARTIST_TOKEN = "artist";
@@ -88,16 +91,27 @@ public class SpotifyApiUtility {
     /**
      * Helper function to get the track for the given Track id.
      * @param trackId: String representing te track id of the Track.
+     * @param imageSize: The size of the image for the track.
      * @return {@link kaaes.spotify.webapi.android.models.Track}
      */
-    public static SpotifyTrackComponent getTrackFromSpotify(String trackId){
+    public static SpotifyTrackComponent getTrackFromSpotify(String trackId, int imageSize){
         SpotifyApi spotifyApi = new SpotifyApi();
         SpotifyService service = spotifyApi.getService();
         Map<String, Object> apiOptions = new HashMap<>();
         apiOptions.put(COUNTRY_TOKEN, USA_SYMBOL);
         Track track = service.getTrack(trackId, apiOptions);
-        SpotifyTrackComponent trackComponent = new SpotifyTrack(track);
+        SpotifyTrackComponent trackComponent = new SpotifyTrack(track, imageSize);
         return trackComponent;
+    }
+
+    /**
+     * Helper function to get the track for the given Track id. THe image size is taken
+     * default.
+     * @param trackId: String representing te track id of the Track.
+     * @return {@link kaaes.spotify.webapi.android.models.Track}
+     */
+    public static SpotifyTrackComponent getTrackFromSpotify(String trackId){
+        return getTrackFromSpotify(trackId, SpotifyTrack.DEFAULT_IMAGE_SIZE);
     }
 
 
@@ -108,10 +122,12 @@ public class SpotifyApiUtility {
             return EMPTY_PIC_LINK;
 
         for(Image image : imagesList){
-            if(image.height == size || image.width == size){
+            if(image.width == size){
+                Log.d(LOG_TAG, "The image size is width : " + image.width);
                 return image.url;
             }
         }
+        Log.d(LOG_TAG, "The image size is width : " + imagesList.get(0).width);
         return imagesList.get(0).url;
     }
 
