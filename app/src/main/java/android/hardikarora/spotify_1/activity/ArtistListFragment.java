@@ -2,12 +2,12 @@ package android.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
 import android.content.Intent;
-import android.hardikarora.spotify_1.adapter.SpotifyArtistListAdapter;
-import android.hardikarora.spotify_1.util.AsyncResponse;
 import android.hardikarora.spotify_1.R;
+import android.hardikarora.spotify_1.adapter.SpotifyArtistListAdapter;
+import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import android.hardikarora.spotify_1.util.AsyncResponse;
 import android.hardikarora.spotify_1.util.SpotifyApiUtility;
 import android.hardikarora.spotify_1.util.SpotifyAsyncTask;
-import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -33,11 +33,15 @@ import java.util.List;
  * Encapsulating the list retrieved by spotify and is displayed in a {@link android.widget.ListView}
  * layout.
  */
-public class SpotifyFragment extends Fragment implements AsyncResponse {
+public class ArtistListFragment extends Fragment implements AsyncResponse {
 
-    private static final String LOG_TAG = SpotifyFragment.class.getSimpleName();
+    private static final String LOG_TAG = ArtistListFragment.class.getSimpleName();
+
+    public static final String TAG = ArtistListFragment.class.getSimpleName();
     public static final String NO_ALBUM_TOAST = "Couldn't find the artist/album.";
     public static final String ARTISTS_TAG = "Artists";
+    public static final String ARTIST_IMAGE_TEXT = "ArtistImage";
+
     List<SpotifyTrackComponent> artistList;
     SpotifyArtistListAdapter spotifyArtistListAdapter;
     FetchSpotifyArtistData fetchSpotifyData;
@@ -47,22 +51,25 @@ public class SpotifyFragment extends Fragment implements AsyncResponse {
     /**
      * Default constructor for the fragment.
      */
-    public SpotifyFragment() {
+    public ArtistListFragment() {
         artistList = new ArrayList<>();
         fetchSpotifyData = new FetchSpotifyArtistData(this);
-        artistList = new ArrayList<>();
+    }
+
+    public static ArtistListFragment newInstance(){
+        return new ArtistListFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        artistList = new ArrayList<>();
+//        artistList = new ArrayList<>();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.refresh_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -103,15 +110,14 @@ public class SpotifyFragment extends Fragment implements AsyncResponse {
 
         List<SpotifyTrackComponent> componentList =
                 (List<SpotifyTrackComponent>)(List<?>) parcelableList;
-        spotifyArtistListAdapter = new SpotifyArtistListAdapter(getActivity(), R.layout.list_item_spotify,
-                R.id.spotify_item_textview, componentList);
-
+        spotifyArtistListAdapter.clear();
+        artistList.clear();
+        artistList.addAll(componentList);
     }
 
     @Override
     public void afterExecution(List<SpotifyTrackComponent> input) {
-        List<SpotifyTrackComponent> artistObjList = input;
-        Log.d(LOG_TAG, "Artist list has been recieved, total items : " + artistObjList.size());
+        Log.d(LOG_TAG, "Artist list has been recieved, total items : " + input.size());
 
         // Reinitialising the async task as it can be executed only once.
         fetchSpotifyData = new FetchSpotifyArtistData(this);
@@ -120,14 +126,14 @@ public class SpotifyFragment extends Fragment implements AsyncResponse {
         spotifyArtistListAdapter.clear();
         artistList.clear();
 
-        if(artistObjList.size() == 0){
+        if(input.size() == 0){
             // If there is not artist we show a toast.
             CharSequence noArtistText = NO_ALBUM_TOAST;
             Toast toast = Toast.makeText(getActivity(), noArtistText, Toast.LENGTH_SHORT);
             toast.show();
         }
 
-        artistList.addAll(artistObjList);
+        artistList.addAll(input);
         spotifyArtistListAdapter.notifyDataSetChanged();
     }
 
@@ -136,9 +142,8 @@ public class SpotifyFragment extends Fragment implements AsyncResponse {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
         // Initializing the adapter and the list view.
-        spotifyArtistListAdapter = new SpotifyArtistListAdapter(getActivity(), R.layout.list_item_spotify,
+        spotifyArtistListAdapter = new SpotifyArtistListAdapter(getActivity(), R.layout.artist_details_item,
                 R.id.spotify_item_textview, artistList);
         spotifyListView = (ListView) rootView.findViewById(R.id.list_view_spotify);
         spotifyListView.setAdapter(spotifyArtistListAdapter);
@@ -154,6 +159,7 @@ public class SpotifyFragment extends Fragment implements AsyncResponse {
                 String artistId = artist.getArtistId();
                 Intent intent = new Intent(getActivity(), ArtistTopTracksActivity.class);
                 intent.putExtra(Intent.EXTRA_TEXT, artistId);
+                intent.putExtra(ARTIST_IMAGE_TEXT, artist.getImageUrl());
                 startActivity(intent);
             }
         });
@@ -185,7 +191,11 @@ public class SpotifyFragment extends Fragment implements AsyncResponse {
             // If the text is valid we fetch the artist information from the
             // spotify api.
             fetchSpotifyData = new FetchSpotifyArtistData(fetchResponse);
-            fetchSpotifyData.execute(searchString);
+            try {
+                fetchSpotifyData.execute(searchString);
+            }catch (Exception e){
+                Log.e(LOG_TAG, "Error while getting artist data : " + e.getMessage());
+            }
         }
 
         @Override

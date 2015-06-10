@@ -11,8 +11,7 @@
         android:id="@+id/spotify_search_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-
-        android:hint="Enter the song/album name."/>
+        android:hint="@string/search_string"/>
 
     <ListView
         android:id="@+id/list_view_spotify"

@@ -20,40 +20,57 @@ import java.util.List;
 public class SpotifyTrackListAdapter extends ArrayAdapter<SpotifyTrackComponent> {
 
     private List<SpotifyTrackComponent> artistTracks;
+    private int resource;
+    private final int ALBUM_NAME_TEXTVIEW_ID = R.id.spotify_album_textview ;
+    private final int ALBUM_IMAGE_ID = R.id.spotify_album_image ;
+    private final int TRACK_NAME_TEXTVIEW_ID = R.id.spotify_trackname_textview;
+
 
     public SpotifyTrackListAdapter(Context context, int resource, int textViewResourceId,
                                    List<SpotifyTrackComponent> artistTracks) {
         super(context, resource, textViewResourceId, artistTracks);
         this.artistTracks = artistTracks;
+        this.resource = resource;
     }
-
-
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View view = convertView;
+        TrackViewHolder trackViewHolder;
+        LayoutInflater inflater = (LayoutInflater)getContext().
+                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         if(view == null){
-            LayoutInflater inflater = (LayoutInflater)getContext().
-                    getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            view = inflater.inflate(R.layout.list_item_spotify, null);
-
+            view = inflater.inflate(resource, null);
+            trackViewHolder = new TrackViewHolder();
+            trackViewHolder.albumTextView = (TextView) view.findViewById(ALBUM_NAME_TEXTVIEW_ID);
+            trackViewHolder.trackTextView = (TextView) view.findViewById(TRACK_NAME_TEXTVIEW_ID);
+            trackViewHolder.imageView = (ImageView) view.findViewById(ALBUM_IMAGE_ID);
+            view.setTag(trackViewHolder);
+        } else {
+            trackViewHolder = (TrackViewHolder) view.getTag();
         }
 
         SpotifyTrackComponent track = artistTracks.get(position);
+        if(track == null) return view;
 
-
-        if(track != null){
-            TextView trackTextView = (TextView) view.findViewById(R.id.spotify_item_textview);
-            trackTextView.setText(track.getAlbumName());
-            String imageUrl = track.getImageUrl();
-
-            ImageView imageView = (ImageView) view.findViewById(R.id.spotify_album_image);
-            if(imageUrl != null) {
-                Picasso.with(getContext()).load(imageUrl).into(imageView);
-            }
+        trackViewHolder.albumTextView.setText(track.getAlbumName());
+        trackViewHolder.trackTextView.setText(track.getTrackName());
+        String imageUrl = track.getImageUrl();
+        if(trackViewHolder != null && trackViewHolder.imageView != null) {
+            Picasso.with(getContext()).load(imageUrl)
+                    .into(trackViewHolder.imageView);
         }
+
         return view;
+    }
+
+    private class TrackViewHolder{
+
+        TextView albumTextView;
+        TextView trackTextView;
+        ImageView imageView;
+
     }
 }

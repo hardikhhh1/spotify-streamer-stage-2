@@ -28,4 +28,13 @@ public abstract class SpotifyTrackComponent {
     public String getImageUrl() { throw new UnsupportedOperationException(); }
 
     public void setImageUrl(String imageUrl) { throw new UnsupportedOperationException(); }
+
+    public String getTrackId() { throw new UnsupportedOperationException(); }
+
+    public void setTrackId(String trackId) { throw new UnsupportedOperationException(); }
+
+    public String getTrackUrl() { throw new UnsupportedOperationException(); }
+
+    public void setTrackUrl(String trackUrl) { throw new UnsupportedOperationException(); }
+
 }

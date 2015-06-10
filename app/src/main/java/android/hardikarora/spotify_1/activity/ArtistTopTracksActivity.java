@@ -1,10 +1,8 @@
 package android.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.hardikarora.spotify_1.R;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -15,9 +13,6 @@ an artist.
  */
 public class ArtistTopTracksActivity extends Activity{
 
-    private static final String LOG_TAG = ArtistTopTracksActivity.class.getSimpleName();
-    private static String artistId;
-
     /**
      * Overriding the oncreate method, called when the view is created.
      * Here the Fragment is initiated.
@@ -26,23 +21,17 @@ public class ArtistTopTracksActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_artist_details);
-        Intent intent = getIntent();
-        artistId = intent.getStringExtra(Intent.EXTRA_TEXT);
-        Log.d(LOG_TAG, "Artist top tracks activity has started : " + artistId);
-
+        setContentView(R.layout.activity_artist_top_tracks);
         if (savedInstanceState == null) {
             TrackListFragment fragment = new TrackListFragment();
             fragment.setArguments(getIntent().getExtras());
+
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, fragment)
+                    .replace(R.id.container, fragment, TrackListFragment.TAG)
                     .commit();
+
         }
-
-
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

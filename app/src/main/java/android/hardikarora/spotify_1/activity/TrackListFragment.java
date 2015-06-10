@@ -2,22 +2,29 @@ package android.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
 import android.content.Intent;
-import android.hardikarora.spotify_1.util.AsyncResponse;
 import android.hardikarora.spotify_1.R;
+import android.hardikarora.spotify_1.adapter.SpotifyTrackListAdapter;
+import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import android.hardikarora.spotify_1.util.AsyncResponse;
 import android.hardikarora.spotify_1.util.SpotifyApiUtility;
 import android.hardikarora.spotify_1.util.SpotifyAsyncTask;
-import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import android.hardikarora.spotify_1.adapter.SpotifyTrackListAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import kaaes.spotify.webapi.android.models.Track;
 
 /**
  * Created by hardikarora on 6/6/15.
@@ -29,67 +36,84 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
 
     private static final String LOG_TAG =  TrackListFragment.class.getSimpleName();
 
+    private static final String NO_TOP_TRACKS =  "Found no top tracks for the artist";
+
+    public static final String TAG =  TrackListFragment.class.getSimpleName();
+    public static final String TOP_TRACKS_TAG = "TopTracks";
+    public static final String SPOTIFY_TRACK_ID_TAG = "SpotifyTrackId";
+
+    List<SpotifyTrackComponent> topTracks;
     SpotifyTrackListAdapter spotifyTrackListAdapter;
-    List<SpotifyTrackComponent> topTracks = new ArrayList<>();
-    FetchArtistTopTrackData fetchArtistTopTrackData = new FetchArtistTopTrackData(this);
+    FetchArtistTopTrackData fetchArtistTopTrackData;
+    ListView topTracksListView;
+    String artistId;
+    String artistImageUrl;
 
     public TrackListFragment() {
-
+        topTracks = new ArrayList<>();
+        fetchArtistTopTrackData = new FetchArtistTopTrackData(this);
     }
 
-
-
+    public static TrackListFragment newInstance(){
+        return new TrackListFragment();
+    }
     @Override
     public void afterExecution(List<SpotifyTrackComponent> input) {
-        topTracks = input;
+        // Reinitialising the async task as it can be executed only once.
         fetchArtistTopTrackData = new FetchArtistTopTrackData(this);
-        spotifyTrackListAdapter = new SpotifyTrackListAdapter(
-                getActivity(), R.layout.list_item_spotify,
-                R.id.spotify_item_textview, input);
 
-        ListView spotifyListView = (ListView) getActivity().findViewById(R.id.list_view_spotify2);
-        spotifyListView.setAdapter(spotifyTrackListAdapter);
+        // Clearing the list adapter, so the new data can be added.
+        spotifyTrackListAdapter.clear();
+        topTracks.clear();
 
+        if(input.size() == 0){
+            // If there is not artist we show a toast.
+            Toast toast = Toast.makeText(getActivity(), NO_TOP_TRACKS, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
+        topTracks.addAll(input);
+        spotifyTrackListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        // To save the state we write all the artist list
+        // in a parcelable list.
         ArrayList<Parcelable> parcelableList = new ArrayList<>();
         if(topTracks != null){
             if(topTracks.size() > 0 ){
                 parcelableList =(ArrayList<Parcelable>) (ArrayList<?>) topTracks;
             }
         }
-        outState.putParcelableArrayList("TopTracks", parcelableList);
+        outState.putParcelableArrayList(TOP_TRACKS_TAG, parcelableList);
 
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        fetchArtistTopTrackData.callback = this;
-        if(savedInstanceState == null){
-            return;
-        }
+        fetchArtistTopTrackData = new FetchArtistTopTrackData(this);
+
+        // If the saved instance is null, function is exited.
+        if(savedInstanceState == null) return;
+
         List<Parcelable> parcelableList;
         parcelableList = savedInstanceState.getParcelableArrayList("TopTracks");
-        if(parcelableList == null){
-            return;
-        }
-        if(!(parcelableList.size() > 0)){
-            return;
-        }
+
+        // If the list is empty, the function is exited.
+        if(parcelableList == null) return;
+        if(!(parcelableList.size() > 0)) return;
 
 
         List<SpotifyTrackComponent> componentList =
                 (List<SpotifyTrackComponent>)(List<?>) parcelableList;
-        if(parcelableList.size() > 0){
-            //TODO : send it to the adapter list.
-            spotifyTrackListAdapter = new SpotifyTrackListAdapter(
-                    getActivity(), R.layout.list_item_spotify,
-                    R.id.spotify_item_textview, componentList);
-        }
+        spotifyTrackListAdapter.clear();
+        topTracks.clear();
+        topTracks.addAll(componentList);
+        spotifyTrackListAdapter.notifyDataSetChanged();
 
     }
 
@@ -97,8 +121,31 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_artist_details, container, false);
-        String artistId ;
+
+        // Initializing the adapter and the list view.
+        spotifyTrackListAdapter = new SpotifyTrackListAdapter(
+                getActivity(), R.layout.album_details_item,
+                R.id.spotify_album_textview, topTracks);
+        topTracksListView = (ListView) rootView.findViewById(R.id.album_list_view);
+        topTracksListView.setAdapter(spotifyTrackListAdapter);
+        topTracksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SpotifyTrackComponent selectedTrack = topTracks.get(position);
+                Intent intent = new Intent(getActivity(), SongPlayActivity.class);
+                intent.putExtra(SPOTIFY_TRACK_ID_TAG, selectedTrack.getTrackId());
+                startActivity(intent);
+
+            }
+        });
+
         artistId = getArguments().getString(Intent.EXTRA_TEXT);
+        artistImageUrl = getArguments().getString(ArtistListFragment.ARTIST_IMAGE_TEXT);
+
+        ImageView imageView = (ImageView) rootView.findViewById(R.id.artist_main_image);
+        if(artistImageUrl != null) {
+            Picasso.with(rootView.getContext()).load(artistImageUrl).into(imageView);
+        }
         try {
             fetchArtistTopTrackData.execute(artistId);
 
@@ -108,6 +155,7 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
 
         return rootView;
     }
+
 
     public class FetchArtistTopTrackData extends SpotifyAsyncTask {
 
@@ -122,7 +170,8 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
             try {
                 spotifyTracks = SpotifyApiUtility.getArtistsTopTracks(artistName);
             } catch (Exception e){
-                Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.getMessage());
+                Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.toString()
+                        + e.getMessage());
                 return new ArrayList<>();
             }
             return spotifyTracks;

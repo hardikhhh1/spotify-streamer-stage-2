@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MainActivity extends Activity {
+public class ArtistSearchActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,11 +15,14 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new SpotifyFragment())
+                    .replace(R.id.container, ArtistListFragment.newInstance(),
+                            ArtistListFragment.TAG)
                     .commit();
+
+
+
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

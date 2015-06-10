@@ -23,11 +23,13 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
+
+    // Library for butter knife.
+    compile 'com.jakewharton:butterknife:6.1.0'
     // Uses this to create RESTful Requests
     compile 'com.squareup.okhttp:okhttp:2.2.0'
     // Uses this to create HTTP connections
-    compile files('/Users/hardikarora/Development/Spotify-1/libs/spotify-web-api-android-0.1.0.jar')
-    compile files('/Users/harora/Development/android/libs/spotify-web-api-android-0.1.0.jar')
+
 }
 
 repositories {

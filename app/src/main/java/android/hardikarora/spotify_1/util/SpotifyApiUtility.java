@@ -3,7 +3,6 @@ package android.hardikarora.spotify_1.util;
 import android.hardikarora.spotify_1.model.SpotifyArtist;
 import android.hardikarora.spotify_1.model.SpotifyTrack;
 import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import kaaes.spotify.webapi.android.models.Image;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 
@@ -24,10 +24,12 @@ import kaaes.spotify.webapi.android.models.Tracks;
  */
 public class SpotifyApiUtility {
 
-    public static final String TYPE_TOKEN = "type";
-    public static final String ARTIST_TOKEN = "artist";
-    public static final String COUNTRY_TOKEN = "country";
-    public static final String USA_SYMBOL = "US";
+    private static final String TYPE_TOKEN = "type";
+    private static final String ARTIST_TOKEN = "artist";
+    private static final String COUNTRY_TOKEN = "country";
+    private static final String USA_SYMBOL = "US";
+    private static final String EMPTY_PIC_LINK =
+            "http://www.cloudcomputing-news.net/media/cloud_question_mark.jpg.600x600_q96.png";
 
     /**
      * Function to search artists with the artist name.
@@ -48,14 +50,8 @@ public class SpotifyApiUtility {
             // For each artist recieved we initialize a spotify artist
             // and append it to the list.
             spotifyArtist = new SpotifyArtist(artist.id, artist.name);
-            String imageUrl = null;
-            if(artist.images.size() > 0){
-                imageUrl = artist.images.get(0).url;
-            }
+            String imageUrl = findImageUrl(artist.images, 200);
             spotifyArtist.setImageUrl(imageUrl);
-//                    for(Image image : artist.images){
-//                    TODO : get the smallest sized image.
-//                    }
             spotifyTrackComponents.add(spotifyArtist);
         }
 
@@ -78,26 +74,46 @@ public class SpotifyApiUtility {
         if(tracks == null)
             return spotifyTracks;
 
+        SpotifyTrack spotifyTrack;
         if(tracks.tracks.size() > 0){
             for(Track track : tracks.tracks){
-                String albumName = track.album.name;
-                String trackName = track.name;
-
-                //                    for(Image image : artist.images){
-//                    TODO : get the smallest sized image.
-//                    }
-
-
-                String imageUrl = track.album.images.get(0).url;
-                spotifyTracks.add(new SpotifyTrack(albumName, trackName,
-                        imageUrl));
+                spotifyTrack = new SpotifyTrack(track);
+                spotifyTracks.add(spotifyTrack);
             }
         }
-
-
         return spotifyTracks;
     }
 
+
+    /**
+     * Helper function to get the track for the given Track id.
+     * @param trackId: String representing te track id of the Track.
+     * @return {@link kaaes.spotify.webapi.android.models.Track}
+     */
+    public static SpotifyTrackComponent getTrackFromSpotify(String trackId){
+        SpotifyApi spotifyApi = new SpotifyApi();
+        SpotifyService service = spotifyApi.getService();
+        Map<String, Object> apiOptions = new HashMap<>();
+        apiOptions.put(COUNTRY_TOKEN, USA_SYMBOL);
+        Track track = service.getTrack(trackId, apiOptions);
+        SpotifyTrackComponent trackComponent = new SpotifyTrack(track);
+        return trackComponent;
+    }
+
+
+    public static String findImageUrl(List<Image> imagesList, int size){
+        if(imagesList == null)
+            return EMPTY_PIC_LINK;
+        if(imagesList.size() == 0)
+            return EMPTY_PIC_LINK;
+
+        for(Image image : imagesList){
+            if(image.height == size || image.width == size){
+                return image.url;
+            }
+        }
+        return imagesList.get(0).url;
+    }
 
 
 }
