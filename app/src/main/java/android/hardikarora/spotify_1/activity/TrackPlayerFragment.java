@@ -1,27 +1,20 @@
 package android.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.hardikarora.spotify_1.R;
-import android.hardikarora.spotify_1.model.SpotifyTrack;
 import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import android.hardikarora.spotify_1.util.AsyncResponse;
-import android.hardikarora.spotify_1.util.SpotifyApiUtility;
-import android.hardikarora.spotify_1.util.SpotifyAsyncTask;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.AsyncTask;
+import android.hardikarora.spotify_1.util.SpotifyPlayerService;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +25,7 @@ public class TrackPlayerFragment extends Fragment implements AsyncResponse, View
 
     public static final String TAG = TrackPlayerFragment.class.getSimpleName();
     public static final String LOG_TAG = TrackPlayerFragment.class.getSimpleName();
+    List<SpotifyTrackComponent> spotifyTrackList;
     SpotifyTrackComponent spotifyTrack;
 
     public TrackPlayerFragment() {
@@ -62,20 +56,14 @@ public class TrackPlayerFragment extends Fragment implements AsyncResponse, View
 
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
             case R.id.player_play_btn_img:
                 Log.d(LOG_TAG, "Playing the track.");
-                try {
-                    String url = spotifyTrack.getTrackUrl();
-                    MediaPlayer player = new MediaPlayer();
-                    player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    player.setDataSource(url);
-                    player.prepare();
-                    player.start();
-                } catch (IOException e){
-                    Log.e(LOG_TAG, "Error while playing track" + e.getMessage());
-                }
-
+                String url = spotifyTrack.getTrackUrl();
+                Intent intent = new Intent(getActivity(), SpotifyPlayerService.class);
+                intent.putExtra("SpotifyTrackUrl", url);
+                getActivity().startService(intent);
                 break;
         }
     }
@@ -93,39 +81,20 @@ public class TrackPlayerFragment extends Fragment implements AsyncResponse, View
 
 
         // If no track id has been set we return the root view.
-        String trackId = getArguments().getString(TrackListFragment.SPOTIFY_TRACK_ID_TAG);
-        if(trackId == null) return rootView;
-        if(trackId.isEmpty()) return rootView;
+        spotifyTrackList = (ArrayList<SpotifyTrackComponent>)(ArrayList<?>)
+                getArguments().getParcelableArrayList("TrackList");
+        int trackIndex = getArguments().getInt("TrackIndex");
+        spotifyTrack = spotifyTrackList.get(trackIndex);
 
-        GetTrackDataTask getTrackDataTask = new GetTrackDataTask(this);
-        try {
-            getTrackDataTask.execute(trackId);
-        } catch (Exception e){
-            Log.e(LOG_TAG, "Error while getting track details from spotify" + e.getMessage());
+        ImageView imageView = (ImageView) rootView.findViewById(R.id.player_album_image);
+        if(imageView != null){
+            // Load image with picasso.
+            Log.d(LOG_TAG, "Loading the background image with picasso.");
+            String imageUrl = spotifyTrack.getImageUrl();
+            Picasso.with(rootView.getContext()).load(imageUrl).into(imageView);
+        } else{
+            Log.e(LOG_TAG, "Image view is null");
         }
         return rootView;
-    }
-
-
-
-
-    private class GetTrackDataTask extends SpotifyAsyncTask{
-
-        private GetTrackDataTask(AsyncResponse callback) {
-            super(callback);
-        }
-
-        @Override
-        protected List<SpotifyTrackComponent> doInBackground(Object[] objects) {
-            String trackId = (String) objects[0];
-            List<SpotifyTrackComponent> spotifyTrackComponentList = new ArrayList<>();
-            if(trackId == null) return null;
-            if(trackId.isEmpty()) return null;
-
-            SpotifyTrackComponent trackComponent = SpotifyApiUtility.getTrackFromSpotify(trackId,
-                    1000);
-            spotifyTrackComponentList.add(trackComponent);
-            return spotifyTrackComponentList;
-        }
     }
 }

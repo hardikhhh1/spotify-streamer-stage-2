@@ -4,7 +4,6 @@ import android.hardikarora.spotify_1.util.SpotifyApiUtility;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.models.Track;
 
 /**
@@ -52,7 +51,7 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
         dest.writeString(this.trackUrl);
     }
 
-    private static Creator TrackCreator = new Creator() {
+    public static final Creator CREATOR = new Creator() {
         @Override
         public SpotifyTrack createFromParcel(Parcel source) {
             return new SpotifyTrack(source.readString(), source.readString(),

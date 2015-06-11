@@ -1,23 +1,13 @@
 package android.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.hardikarora.spotify_1.R;
 import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import android.hardikarora.spotify_1.util.SpotifyApiUtility;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
-import android.hardikarora.spotify_1.R;
-import android.widget.ImageView;
-
-import com.squareup.picasso.Picasso;
-
-import kaaes.spotify.webapi.android.models.Track;
+import java.util.ArrayList;
 
 public class SongPlayActivity extends Activity {
 

@@ -39,7 +39,7 @@ public class SpotifyArtist extends SpotifyTrackComponent implements Parcelable {
         dest.writeString(this.imageUrl);
     }
 
-    private static Parcelable.Creator TrackCreator = new Parcelable.Creator() {
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
         @Override
         public SpotifyArtist createFromParcel(Parcel source) {
             return new SpotifyArtist(source.readString(),

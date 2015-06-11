@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.hardikarora.spotify_1.R;
 import android.hardikarora.spotify_1.adapter.SpotifyTrackListAdapter;
+import android.hardikarora.spotify_1.model.SpotifyTrack;
 import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import android.hardikarora.spotify_1.util.AsyncResponse;
 import android.hardikarora.spotify_1.util.SpotifyApiUtility;
@@ -23,8 +24,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Track;
 
 /**
  * Created by hardikarora on 6/6/15.
@@ -133,6 +132,9 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 SpotifyTrackComponent selectedTrack = topTracks.get(position);
                 Intent intent = new Intent(getActivity(), SongPlayActivity.class);
+                intent.putParcelableArrayListExtra("TrackList", (ArrayList<SpotifyTrack>)
+                        (ArrayList<?>)topTracks);
+                intent.putExtra("TrackIndex", position);
                 intent.putExtra(SPOTIFY_TRACK_ID_TAG, selectedTrack.getTrackId());
                 startActivity(intent);
 
