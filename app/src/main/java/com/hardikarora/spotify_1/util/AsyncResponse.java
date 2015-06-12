@@ -1,6 +1,6 @@
-package android.hardikarora.spotify_1.util;
+package com.hardikarora.spotify_1.util;
 
-import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 
 import java.util.List;
 

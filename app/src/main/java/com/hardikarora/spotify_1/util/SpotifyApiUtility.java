@@ -1,8 +1,8 @@
-package android.hardikarora.spotify_1.util;
+package com.hardikarora.spotify_1.util;
 
-import android.hardikarora.spotify_1.model.SpotifyArtist;
-import android.hardikarora.spotify_1.model.SpotifyTrack;
-import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import com.hardikarora.spotify_1.model.SpotifyArtist;
+import com.hardikarora.spotify_1.model.SpotifyTrack;
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class SpotifyApiUtility {
     /**
      * Function to search artists with the artist name.
      * @param artistName Name of the artist.
-     * @return A list of {@link android.hardikarora.spotify_1.model.SpotifyArtist }
+     * @return A list of {@link com.hardikarora.spotify_1.model.SpotifyArtist }
      */
     public static List<SpotifyTrackComponent> searchArtists(String artistName){
         SpotifyApi spotifyApi = new SpotifyApi();
@@ -65,7 +65,7 @@ public class SpotifyApiUtility {
     /**
      * Function to get the top tracks for an artist
      * @param artistID : String representing the id of the artist.
-     * @return List of {@link android.hardikarora.spotify_1.model.SpotifyTrack}
+     * @return List of {@link com.hardikarora.spotify_1.model.SpotifyTrack}
      */
     public static List<SpotifyTrackComponent> getArtistsTopTracks(String artistID){
         SpotifyApi spotifyApi = new SpotifyApi();

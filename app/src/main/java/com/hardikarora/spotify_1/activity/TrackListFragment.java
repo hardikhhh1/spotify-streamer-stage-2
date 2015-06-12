@@ -1,14 +1,14 @@
-package android.hardikarora.spotify_1.activity;
+package com.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
 import android.content.Intent;
-import android.hardikarora.spotify_1.R;
-import android.hardikarora.spotify_1.adapter.SpotifyTrackListAdapter;
-import android.hardikarora.spotify_1.model.SpotifyTrack;
-import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import android.hardikarora.spotify_1.util.AsyncResponse;
-import android.hardikarora.spotify_1.util.SpotifyApiUtility;
-import android.hardikarora.spotify_1.util.SpotifyAsyncTask;
+import com.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.adapter.SpotifyTrackListAdapter;
+import com.hardikarora.spotify_1.model.SpotifyTrack;
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import com.hardikarora.spotify_1.util.AsyncResponse;
+import com.hardikarora.spotify_1.util.SpotifyApiUtility;
+import com.hardikarora.spotify_1.util.SpotifyAsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;

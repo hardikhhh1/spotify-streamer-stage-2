@@ -1,8 +1,8 @@
-package android.hardikarora.spotify_1.adapter;
+package com.hardikarora.spotify_1.adapter;
 
 import android.content.Context;
-import android.hardikarora.spotify_1.R;
-import android.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import com.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

@@ -1,4 +1,4 @@
-package android.hardikarora.spotify_1.model;
+package com.hardikarora.spotify_1.model;
 
 
 import android.os.Parcel;

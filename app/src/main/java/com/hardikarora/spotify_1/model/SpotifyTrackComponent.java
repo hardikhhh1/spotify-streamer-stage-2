@@ -1,4 +1,4 @@
-package android.hardikarora.spotify_1.model;
+package com.hardikarora.spotify_1.model;
 
 /**
  * Created by hardikarora on 6/5/15.

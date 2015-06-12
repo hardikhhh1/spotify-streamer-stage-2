@@ -1,4 +1,4 @@
-package android.hardikarora.spotify_1;
+package com.hardikarora.spotify_1;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

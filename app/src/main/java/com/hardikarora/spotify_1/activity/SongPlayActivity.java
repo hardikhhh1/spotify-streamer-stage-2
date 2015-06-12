@@ -1,42 +1,35 @@
-package android.hardikarora.spotify_1.activity;
+package com.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
-import android.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.R;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+public class SongPlayActivity extends Activity {
 
-/*
-This class represents the activity to show the top tracks for
-an artist.
- */
-public class ArtistTopTracksActivity extends Activity{
+    public static final String LOG_TAG = SongPlayActivity.class.getSimpleName();
 
-    /**
-     * Overriding the oncreate method, called when the view is created.
-     * Here the Fragment is initiated.
-     * @param savedInstanceState
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_artist_top_tracks);
+        setContentView(R.layout.activity_song_play);
         if (savedInstanceState == null) {
-            TrackListFragment fragment = new TrackListFragment();
+            TrackPlayerFragment fragment = TrackPlayerFragment.newInstance();
             fragment.setArguments(getIntent().getExtras());
 
             getFragmentManager().beginTransaction()
-                    .replace(R.id.container, fragment, TrackListFragment.TAG)
+                    .replace(R.id.container, fragment, TrackPlayerFragment.TAG)
                     .commit();
 
         }
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_artist_details, menu);
+        getMenuInflater().inflate(R.menu.menu_song_play, menu);
         return true;
     }
 
@@ -56,4 +49,11 @@ public class ArtistTopTracksActivity extends Activity{
     }
 
 
+
+//    public class PlayerDataHolder{
+//
+//        ImageView backgroundImageView;
+//
+//
+//    }
 }

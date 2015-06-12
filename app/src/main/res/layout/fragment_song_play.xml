@@ -4,7 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="android.hardikarora.spotify_1.activity.SongPlayActivity.TrackPlayerFragment">
+    tools:context="com.hardikarora.spotify_1.activity.SongPlayActivity.TrackPlayerFragment">
 
     <TextView
         android:layout_width="match_parent"
@@ -12,8 +12,9 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Artist Name"
         android:id="@+id/player_artist_name_textview"
-        android:textAlignment="center"
-        android:layout_gravity="center_horizontal|top" />
+        android:textAlignment="inherit"
+        android:layout_gravity="center_horizontal|top"
+        android:gravity="center" />
 
     <TextView
         android:layout_width="match_parent"
@@ -21,24 +22,26 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Song Name"
         android:id="@+id/player_album_name_textview"
-        android:layout_below="@id/player_artist_name_textview"/>
+        android:layout_below="@id/player_artist_name_textview"
+        android:gravity="center" />
 
     <ImageView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/player_album_name_textview"
         android:id="@+id/player_album_image"/>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Large Text"
         android:id="@+id/player_track_name_textview"
-        android:layout_below="@id/player_album_image"/>
+        android:layout_below="@id/player_album_image"
+        android:gravity="center" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@id/player_track_name_textview">
@@ -49,7 +52,8 @@
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_media_previous"
                 android:id="@+id/player_prev_btn_img"
-                android:contentDescription="Previous Track"/>
+                android:contentDescription="Previous Track"
+                android:layout_weight="1" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -57,7 +61,8 @@
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_media_play"
                 android:id="@+id/player_play_btn_img"
-                android:contentDescription="Play Track"/>
+                android:contentDescription="Play Track"
+                android:layout_weight="1" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -65,7 +70,8 @@
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_media_next"
                 android:id="@+id/player_next_btn_img"
-                android:contentDescription="Next Track"/>
+                android:contentDescription="Next Track"
+                android:layout_weight="1" />
 
         </LinearLayout>
 
