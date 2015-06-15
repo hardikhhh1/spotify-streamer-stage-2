@@ -18,10 +18,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -44,6 +48,7 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     SpotifyTrackComponent spotifyTrack;
     int trackIndex;
     private PlayerViewHolder playerViewHolder;
+    private ShareActionProvider mShareActionProvider;
 
 
     private SpotifyPlayerService spotifyPlayerService;
@@ -77,6 +82,30 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
         getActivity().startService(intent);
 
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_song_play, menu);
+
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+
+        mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+
+
+        //TODO: add a spotify as extra text.
+        Intent shareButtonIntent = new Intent(Intent.ACTION_SEND);
+        shareButtonIntent.setType("text/plain");
+        String shareString = spotifyTrack.getTrackUrl();
+        shareButtonIntent.putExtra(Intent.EXTRA_SUBJECT, "A great song indeed !!");
+        shareButtonIntent.putExtra(Intent.EXTRA_TEXT, shareString);
+        if(mShareActionProvider != null){
+            mShareActionProvider.setShareIntent(shareButtonIntent);
+        }
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
 
     @Override
     public void onPause() {
@@ -210,8 +239,15 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
         // Setting the view objects with respect to the track.
         playerViewHolder.setViewObjects(rootView, (SpotifyTrack)spotifyTrack);
 
+
+
+        // Setting the share intent for share button.
+        setHasOptionsMenu(true);
+
         return rootView;
     }
+
+
 
     static class PlayerViewHolder{
 

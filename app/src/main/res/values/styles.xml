@@ -2,13 +2,8 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:style/Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/SpotifyActionBar</item>
     </style>
 
-    <style name="SpotifyActionBar" parent="@android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">@color/title_background</item>
-        <item name="android:textColor">@color/title_text</item>
-    </style>
 
 </resources>
 

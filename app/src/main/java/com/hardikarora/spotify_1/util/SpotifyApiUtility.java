@@ -34,7 +34,9 @@ public class SpotifyApiUtility{
 
     private static final String TYPE_TOKEN = "type";
     private static final String ARTIST_TOKEN = "artist";
-    private static final String COUNTRY_TOKEN = "market";
+    private static final String COUNTRY_TOKEN = "country";
+    //TODO: check to see where and how to use market token.
+    private static final String MARKET_TOKEN = "market";
     private static final String USA_SYMBOL = "US";
     private static final String EMPTY_PIC_LINK =
             "http://www.cloudcomputing-news.net/media/cloud_question_mark.jpg.600x600_q96.png";
@@ -147,7 +149,7 @@ public class SpotifyApiUtility{
     private String getCountryCode(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         String countryToken = preferences.getString("countryCode", USA_SYMBOL);
-        return countryToken;
+        return USA_SYMBOL;
     }
 
 
