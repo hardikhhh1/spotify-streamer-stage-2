@@ -3,6 +3,11 @@ package com.hardikarora.spotify_1.util;
 import com.hardikarora.spotify_1.model.SpotifyArtist;
 import com.hardikarora.spotify_1.model.SpotifyTrack;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -23,27 +28,35 @@ import kaaes.spotify.webapi.android.models.Tracks;
  *
  * Class which has methods that wrap arround the spotify api.
  */
-public class SpotifyApiUtility {
+public class SpotifyApiUtility{
 
     public static final String LOG_TAG = SpotifyApiUtility.class.getSimpleName();
 
     private static final String TYPE_TOKEN = "type";
     private static final String ARTIST_TOKEN = "artist";
-    private static final String COUNTRY_TOKEN = "country";
+    private static final String COUNTRY_TOKEN = "market";
     private static final String USA_SYMBOL = "US";
     private static final String EMPTY_PIC_LINK =
             "http://www.cloudcomputing-news.net/media/cloud_question_mark.jpg.600x600_q96.png";
+
+    private Context mContext;
+
+    public SpotifyApiUtility(Context context){
+        this.mContext = context;
+    }
 
     /**
      * Function to search artists with the artist name.
      * @param artistName Name of the artist.
      * @return A list of {@link com.hardikarora.spotify_1.model.SpotifyArtist }
      */
-    public static List<SpotifyTrackComponent> searchArtists(String artistName){
+    public List<SpotifyTrackComponent> searchArtists(String artistName){
         SpotifyApi spotifyApi = new SpotifyApi();
         SpotifyService spotifyService = spotifyApi.getService();
         Map<String, Object> apiOptions = new HashMap<>();
+        apiOptions.put(COUNTRY_TOKEN, getCountryCode());
         apiOptions.put(TYPE_TOKEN, ARTIST_TOKEN);
+
         ArtistsPager artists = spotifyService.searchArtists(artistName, apiOptions);
         List<Artist> artistList  = artists.artists.items;
 
@@ -67,11 +80,11 @@ public class SpotifyApiUtility {
      * @param artistID : String representing the id of the artist.
      * @return List of {@link com.hardikarora.spotify_1.model.SpotifyTrack}
      */
-    public static List<SpotifyTrackComponent> getArtistsTopTracks(String artistID){
+    public List<SpotifyTrackComponent> getArtistsTopTracks(String artistID){
         SpotifyApi spotifyApi = new SpotifyApi();
         SpotifyService service = spotifyApi.getService();
         Map<String, Object> apiOptions = new HashMap<>();
-        apiOptions.put(COUNTRY_TOKEN, USA_SYMBOL);
+        apiOptions.put(COUNTRY_TOKEN, getCountryCode());
         Tracks tracks = service.getArtistTopTrack(artistID, apiOptions);
         List<SpotifyTrackComponent> spotifyTracks = new ArrayList<>();
         if(tracks == null)
@@ -94,11 +107,11 @@ public class SpotifyApiUtility {
      * @param imageSize: The size of the image for the track.
      * @return {@link kaaes.spotify.webapi.android.models.Track}
      */
-    public static SpotifyTrackComponent getTrackFromSpotify(String trackId, int imageSize){
+    public SpotifyTrackComponent getTrackFromSpotify(String trackId, int imageSize){
         SpotifyApi spotifyApi = new SpotifyApi();
         SpotifyService service = spotifyApi.getService();
         Map<String, Object> apiOptions = new HashMap<>();
-        apiOptions.put(COUNTRY_TOKEN, USA_SYMBOL);
+        apiOptions.put(COUNTRY_TOKEN, getCountryCode());
         Track track = service.getTrack(trackId, apiOptions);
         SpotifyTrackComponent trackComponent = new SpotifyTrack(track, imageSize);
         return trackComponent;
@@ -110,12 +123,12 @@ public class SpotifyApiUtility {
      * @param trackId: String representing te track id of the Track.
      * @return {@link kaaes.spotify.webapi.android.models.Track}
      */
-    public static SpotifyTrackComponent getTrackFromSpotify(String trackId){
-        return getTrackFromSpotify(trackId, SpotifyTrack.DEFAULT_IMAGE_SIZE);
+    public SpotifyTrackComponent getTrackFromSpotify(String trackId){
+        return this.getTrackFromSpotify(trackId, SpotifyTrack.DEFAULT_IMAGE_SIZE);
     }
 
 
-    public static String findImageUrl(List<Image> imagesList, int size){
+    public String findImageUrl(List<Image> imagesList, int size){
         if(imagesList == null)
             return EMPTY_PIC_LINK;
         if(imagesList.size() == 0)
@@ -129,6 +142,12 @@ public class SpotifyApiUtility {
         }
         Log.d(LOG_TAG, "The image size is width : " + imagesList.get(0).width);
         return imagesList.get(0).url;
+    }
+
+    private String getCountryCode(){
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String countryToken = preferences.getString("countryCode", USA_SYMBOL);
+        return countryToken;
     }
 
 

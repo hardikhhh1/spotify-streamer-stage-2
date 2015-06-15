@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.hardikarora.spotify_1.activity.ArtistSearchActivity"
+            android:name=".activity.ArtistSearchActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,14 +20,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.hardikarora.spotify_1.activity.ArtistTopTracksActivity"
+            android:name=".activity.ArtistTopTracksActivity"
             android:label="@string/title_activity_artist_details" >
         </activity>
         <activity
-            android:name="com.hardikarora.spotify_1.activity.SongPlayActivity"
+            android:name=".activity.SongPlayActivity"
             android:label="@string/title_activity_song_play" >
         </activity>
-        <service android:name="com.hardikarora.spotify_1.util.SpotifyPlayerService"/>
+
+        <service android:name=".util.SpotifyPlayerService" />
+
+        <activity
+            android:name=".activity.CountryCodeActivity"
+            android:label="@string/title_activity_country_code" >
+        </activity>
     </application>
 
 </manifest>

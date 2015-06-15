@@ -44,6 +44,7 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     List<SpotifyTrackComponent> topTracks;
     SpotifyTrackListAdapter spotifyTrackListAdapter;
     FetchArtistTopTrackData fetchArtistTopTrackData;
+    SpotifyApiUtility utility;
     ListView topTracksListView;
     String artistId;
     String artistImageUrl;
@@ -51,6 +52,7 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     public TrackListFragment() {
         topTracks = new ArrayList<>();
         fetchArtistTopTrackData = new FetchArtistTopTrackData(this);
+
     }
 
     public static TrackListFragment newInstance(){
@@ -154,7 +156,7 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
         } catch(Exception e){
             Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.getMessage());
         }
-
+        utility = new SpotifyApiUtility(getActivity());
         return rootView;
     }
 
@@ -170,7 +172,7 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
             List<SpotifyTrackComponent> spotifyTracks;
             String artistName = (String) params[0];
             try {
-                spotifyTracks = SpotifyApiUtility.getArtistsTopTracks(artistName);
+                spotifyTracks = utility.getArtistsTopTracks(artistName);
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.toString()
                         + e.getMessage());

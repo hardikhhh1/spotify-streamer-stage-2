@@ -2,6 +2,8 @@ package com.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
 import com.hardikarora.spotify_1.R;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,9 +20,6 @@ public class ArtistSearchActivity extends Activity {
                     .replace(R.id.container, ArtistListFragment.newInstance(),
                             ArtistListFragment.TAG)
                     .commit();
-
-
-
         }
     }
 
@@ -39,7 +38,9 @@ public class ArtistSearchActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.menu_country_code) {
+            Intent intent = new Intent(this, CountryCodeActivity.class);
+            startActivity(intent);
             return true;
         }
 

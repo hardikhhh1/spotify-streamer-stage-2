@@ -1,0 +1,12 @@
+<preference-headers
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <header android:fragment="com.hardikarora.spotify_1.activity.CountryCodeActivity$CountryCodeFragment"
+        android:icon="@drawable/ic_play_arrow_black_24dp"
+        android:title="Country Code"
+        android:summary="Some other preferences you can see.">
+        <!-- Arbitrary key/value pairs can be included with a header as
+             arguments to its fragment. -->
+    </header>
+
+</preference-headers>

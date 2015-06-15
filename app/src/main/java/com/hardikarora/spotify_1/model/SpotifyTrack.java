@@ -33,7 +33,7 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
 
     public SpotifyTrack(Track spotifyTrack, int imageSize) {
         this(spotifyTrack.album.name, spotifyTrack.name,
-                SpotifyApiUtility.findImageUrl(spotifyTrack.album.images, imageSize),
+                new SpotifyApiUtility(null).findImageUrl(spotifyTrack.album.images, imageSize),
                 spotifyTrack.id, spotifyTrack.preview_url);
     }
 

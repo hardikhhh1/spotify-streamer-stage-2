@@ -47,6 +47,7 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     FetchSpotifyArtistData fetchSpotifyData;
     AsyncResponse fetchResponse = this;
     ListView spotifyListView;
+    SpotifyApiUtility utility;
 
     /**
      * Default constructor for the fragment.
@@ -54,6 +55,7 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     public ArtistListFragment() {
         artistList = new ArrayList<>();
         fetchSpotifyData = new FetchSpotifyArtistData(this);
+
     }
 
     public static ArtistListFragment newInstance(){
@@ -163,6 +165,7 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
                 startActivity(intent);
             }
         });
+        utility = new SpotifyApiUtility(getActivity());
         return rootView;
     }
 
@@ -219,8 +222,9 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
         protected List<SpotifyTrackComponent> doInBackground(Object... params) {
             String artistName = (String) params[0];
             List<SpotifyTrackComponent> spotifyTrackComponents = new ArrayList<>();
+
             try {
-                spotifyTrackComponents = SpotifyApiUtility.searchArtists(artistName);
+                spotifyTrackComponents = utility.searchArtists(artistName);
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error while getting the spotify artists list" +
                         " data in the task : " + e.getMessage());

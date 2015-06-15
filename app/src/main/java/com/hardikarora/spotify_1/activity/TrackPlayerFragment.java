@@ -1,6 +1,9 @@
 package com.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -72,6 +76,63 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
         getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
         getActivity().startService(intent);
 
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        try {
+            // Initiating the intents for playback controls.
+            Intent playIntent = new Intent(getActivity(), SpotifyPlayerService.class).setAction("Play");
+            Intent previousIntent = new Intent(getActivity(), SpotifyPlayerService.class).
+                    setAction("Previous");
+            Intent nextIntent = new Intent(getActivity(), SpotifyPlayerService.class).setAction("Next");
+
+            // Initiating the pending intents for playback controls.
+            PendingIntent playPendingIntent = PendingIntent.getService(getActivity(), 0,
+                    playIntent, 0);
+            PendingIntent previousPendingIntent = PendingIntent.getService(getActivity(), 0,
+                    previousIntent, 0);
+            PendingIntent nextPendingIntent = PendingIntent.getService(getActivity(), 0,
+                    nextIntent, 0);
+
+
+            NotificationManager nm = (NotificationManager) getActivity()
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+
+            Notification.Builder builder = new Notification.Builder(getActivity());
+
+            RemoteViews notificationView =
+                    new RemoteViews(getActivity().getPackageName(), R.layout.notification_player);
+
+            notificationView.setOnClickPendingIntent(R.id.notification_play_btn_img,
+                     playPendingIntent);
+            notificationView.setOnClickPendingIntent(R.id.notification_prev_btn_img,
+                    previousPendingIntent);
+            notificationView.setOnClickPendingIntent(R.id.notification_next_btn_img,
+                    nextPendingIntent);
+
+            builder.setContent(notificationView)
+                    .setSmallIcon(R.drawable.ic_skip_next_black_24dp)
+                    .setOngoing(true)
+                    .setTicker("Spotify Streamer");
+
+            Notification n = builder.build();
+            nm.notify(1, n);
+        }
+        catch (Exception e){
+            Log.e(LOG_TAG,  "Error while getting log for the player." + e.getMessage() + e.getStackTrace());
+        }
+
+    }
+
+
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override

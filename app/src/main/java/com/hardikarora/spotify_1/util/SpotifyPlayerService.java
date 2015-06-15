@@ -36,6 +36,17 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String action = intent.getAction();
+        if(action == null) return super.onStartCommand(intent, flags, startId);
+
+        if(action.equals("Play")){
+            playButtonPressed();
+        }else if(action.equals("Next")){
+            nextTrack();
+        }else if(action.equals("Previous")){
+            previousTrack();
+        }
+
         return super.onStartCommand(intent, flags, startId);
     }
 

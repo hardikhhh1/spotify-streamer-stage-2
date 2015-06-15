@@ -7,5 +7,8 @@
     <color name="title_background">#000000</color>
     <color name="title_text">#FFF</color>
     <string name="title_activity_song_play">SongPlayActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="preferences_title">Preferences</string>
+    <string name="title_country_code">Country Code</string>
+
+    <string name="title_activity_country_code">CountryCodeActivity</string>
 </resources>
