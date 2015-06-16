@@ -58,7 +58,7 @@ public class SpotifyTrackListAdapter extends ArrayAdapter<SpotifyTrackComponent>
         return view;
     }
 
-    private class TrackViewHolder{
+    class TrackViewHolder{
 
         @InjectView(R.id.spotify_album_textview) TextView albumTextView;
         @InjectView(R.id.spotify_trackname_textview) TextView trackTextView;
