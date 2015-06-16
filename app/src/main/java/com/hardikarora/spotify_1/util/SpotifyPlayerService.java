@@ -34,6 +34,7 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
 
     public List<SpotifyTrackComponent> spotifyTrackList;
     public int trackIndex;
+    public int previousTrackIndex;
 
     private final IBinder mBinder = new SpotifyBinder();
 
@@ -49,7 +50,7 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
             playButtonPressed();
         }else if(action.equals(TrackPlayerFragment.NEXT_ACTION)){
             nextTrack();
-        }else if(action.equals("Previous")){
+        }else if(action.equals(TrackPlayerFragment.PREVIOUS_ACTION)){
             previousTrack();
         }
 
@@ -57,36 +58,32 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     }
 
     public int playButtonPressed(){
-        String  spotifyTrackUrl = spotifyTrackList.get(trackIndex).getTrackUrl();
+
         if(spotifyPlayerState == PlayerState.Play){
+            previousTrackIndex = trackIndex;
             player.pause();
             spotifyPlayerState = PlayerState.Paused;
             return trackIndex;
-        } else if(spotifyPlayerState == PlayerState.Paused){
+        } else if(spotifyPlayerState == PlayerState.Paused && previousTrackIndex == trackIndex){
             player.start();
             spotifyPlayerState = PlayerState.Play;
             return trackIndex;
         }
 
-        playTrack(spotifyTrackUrl);
+        resetAndPlayTrack();
+
         return trackIndex;
     }
 
     public int nextTrack(){
 
         trackIndex = (trackIndex + 1) % spotifyTrackList.size();
-        String  spotifyTrackUrl = spotifyTrackList.get(this.trackIndex).getTrackUrl();
 
         // If the player is stopped we just change the track index, but
         // don't play the music.
+        if(spotifyPlayerState != PlayerState.Play) { return trackIndex; }
 
-        if(spotifyPlayerState != PlayerState.Play) {
-            return trackIndex;
-        } else{
-            player.stop();
-            player.reset();
-        }
-        playTrack(spotifyTrackUrl);
+        resetAndPlayTrack();
         return trackIndex;
     }
 
@@ -98,17 +95,17 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
 
         // If the player is stopped we just change the track index, but
         // don't play the music.
-        if(spotifyPlayerState != PlayerState.Play) {
-            return trackIndex;
-        } else{
-            player.stop();
-            player.reset();
-        }
+        if(spotifyPlayerState != PlayerState.Play) { return trackIndex; }
 
-        String spotifyTrackUrl = spotifyTrackList.get(trackIndex).getTrackUrl();
-
-        playTrack(spotifyTrackUrl);
+        resetAndPlayTrack();
         return trackIndex;
+    }
+
+    private void resetAndPlayTrack(){
+        String  spotifyTrackUrl = spotifyTrackList.get(trackIndex).getTrackUrl();
+        player.stop();
+        player.reset();
+        playTrack(spotifyTrackUrl);
     }
 
     private void playTrack(String spotifyTrackUrl){
@@ -157,14 +154,10 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
         songFinishedIntent.putExtra(TrackListFragment.TRACK_INDEX_TAG, trackIndex + 1);
         sendBroadcast(songFinishedIntent);
         nextTrack();
-
     }
 
     public class SpotifyBinder extends Binder{
-
-        public SpotifyPlayerService getService(){
-            return SpotifyPlayerService.this;
-        }
+        public SpotifyPlayerService getService(){ return SpotifyPlayerService.this; }
     }
 
 }
