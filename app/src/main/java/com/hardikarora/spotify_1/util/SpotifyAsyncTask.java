@@ -1,7 +1,8 @@
 package com.hardikarora.spotify_1.util;
 
-import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import android.os.AsyncTask;
+
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 
 import java.util.List;
 

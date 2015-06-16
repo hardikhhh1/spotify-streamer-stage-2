@@ -1,12 +1,12 @@
 package com.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
-import com.hardikarora.spotify_1.R;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.hardikarora.spotify_1.R;
 
 
 public class ArtistSearchActivity extends Activity {

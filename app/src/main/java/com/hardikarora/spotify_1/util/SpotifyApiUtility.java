@@ -1,14 +1,13 @@
 package com.hardikarora.spotify_1.util;
 
-import com.hardikarora.spotify_1.model.SpotifyArtist;
-import com.hardikarora.spotify_1.model.SpotifyTrack;
-import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.hardikarora.spotify_1.model.SpotifyArtist;
+import com.hardikarora.spotify_1.model.SpotifyTrack;
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 
 import java.util.ArrayList;
 import java.util.HashMap;

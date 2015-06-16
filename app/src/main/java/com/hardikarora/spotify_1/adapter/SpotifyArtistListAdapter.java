@@ -1,8 +1,6 @@
 package com.hardikarora.spotify_1.adapter;
 
 import android.content.Context;
-import com.hardikarora.spotify_1.R;
-import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

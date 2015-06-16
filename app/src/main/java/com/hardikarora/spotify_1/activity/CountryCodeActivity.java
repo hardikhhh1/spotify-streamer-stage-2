@@ -9,6 +9,10 @@ import android.widget.Button;
 import com.hardikarora.spotify_1.R;
 
 
+/**
+ * Class representing activity to set the country code
+ * for the user.
+ */
 public class CountryCodeActivity extends PreferenceActivity {
 
     @Override
@@ -22,8 +26,7 @@ public class CountryCodeActivity extends PreferenceActivity {
 
         PreferenceFragment preferenceFragment = new CountryCodeFragment();
 
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, preferenceFragment)
+        getFragmentManager().beginTransaction().replace(android.R.id.content, preferenceFragment)
                 .commit();
     }
 
@@ -36,8 +39,6 @@ public class CountryCodeActivity extends PreferenceActivity {
                     R.xml.advanced_preferences, false);
             addPreferencesFromResource(R.xml.advanced_preferences);
         }
-
-
 
     }
 }

@@ -2,12 +2,6 @@ package com.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
 import android.content.Intent;
-import com.hardikarora.spotify_1.R;
-import com.hardikarora.spotify_1.adapter.SpotifyArtistListAdapter;
-import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import com.hardikarora.spotify_1.util.AsyncResponse;
-import com.hardikarora.spotify_1.util.SpotifyApiUtility;
-import com.hardikarora.spotify_1.util.SpotifyAsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -24,8 +18,18 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.adapter.SpotifyArtistListAdapter;
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import com.hardikarora.spotify_1.util.AsyncResponse;
+import com.hardikarora.spotify_1.util.SpotifyApiUtility;
+import com.hardikarora.spotify_1.util.SpotifyAsyncTask;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 /**
  * Created by hardikarora on 6/2/15.
@@ -46,8 +50,10 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     SpotifyArtistListAdapter spotifyArtistListAdapter;
     FetchSpotifyArtistData fetchSpotifyData;
     AsyncResponse fetchResponse = this;
-    ListView spotifyListView;
     SpotifyApiUtility utility;
+
+    @InjectView(R.id.spotify_search_text) EditText searchText;
+    @InjectView(R.id.list_view_spotify) ListView spotifyListView;
 
     /**
      * Default constructor for the fragment.
@@ -55,7 +61,6 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     public ArtistListFragment() {
         artistList = new ArrayList<>();
         fetchSpotifyData = new FetchSpotifyArtistData(this);
-
     }
 
     public static ArtistListFragment newInstance(){
@@ -66,7 +71,6 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-//        artistList = new ArrayList<>();
     }
 
     @Override
@@ -144,13 +148,14 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
                              Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
         // Initializing the adapter and the list view.
         spotifyArtistListAdapter = new SpotifyArtistListAdapter(getActivity(), R.layout.artist_details_item,
                 R.id.spotify_item_textview, artistList);
-        spotifyListView = (ListView) rootView.findViewById(R.id.list_view_spotify);
+
+        ButterKnife.inject(this, rootView);
         spotifyListView.setAdapter(spotifyArtistListAdapter);
 
-        EditText searchText = (EditText) rootView.findViewById(R.id.spotify_search_text);
         searchText.addTextChangedListener(new ArtistTextSearchTextWatcher());
         spotifyListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

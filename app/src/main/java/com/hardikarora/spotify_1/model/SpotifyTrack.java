@@ -1,8 +1,9 @@
 package com.hardikarora.spotify_1.model;
 
-import com.hardikarora.spotify_1.util.SpotifyApiUtility;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.hardikarora.spotify_1.util.SpotifyApiUtility;
 
 import kaaes.spotify.webapi.android.models.Track;
 

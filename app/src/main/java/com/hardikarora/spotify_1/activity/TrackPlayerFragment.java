@@ -4,15 +4,12 @@ import android.app.Fragment;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import com.hardikarora.spotify_1.R;
-import com.hardikarora.spotify_1.model.SpotifyTrack;
-import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import com.hardikarora.spotify_1.util.SpotifyPlayerService;
-
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,6 +25,10 @@ import android.widget.RemoteViews;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
+import com.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.model.SpotifyTrack;
+import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import com.hardikarora.spotify_1.util.SpotifyPlayerService;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -39,19 +40,24 @@ import butterknife.InjectView;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TrackPlayerFragment extends Fragment implements View.OnClickListener,
-        MediaPlayer.OnCompletionListener{
+public class TrackPlayerFragment extends Fragment implements View.OnClickListener{
 
     public static final String TAG = TrackPlayerFragment.class.getSimpleName();
     public static final String LOG_TAG = TrackPlayerFragment.class.getSimpleName();
-    List<SpotifyTrackComponent> spotifyTrackList;
-    SpotifyTrackComponent spotifyTrack;
-    int trackIndex;
+    public static final String TRACK_SUBJECT_MESSAGE = "A great song indeed !!";
+    public static final String PLAY_ACTION = "Play";
+    public static final String NEXT_ACTION = "Next";
+    public static final String PREVIOUS_ACTION = "Previous";
+    public static final String SPOTIFY_STREAMER_TICKER = "Spotify Streamer";
+
     private PlayerViewHolder playerViewHolder;
     private ShareActionProvider mShareActionProvider;
-
-
     private SpotifyPlayerService spotifyPlayerService;
+
+    List<SpotifyTrackComponent> spotifyTrackList; // List of spotify tracks.
+    int trackIndex;
+
+    private BroadcastReceiver playerReciever;
 
     // A service connection to connect to the spotify api service.
     public ServiceConnection connection = new ServiceConnection() {
@@ -85,18 +91,14 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.menu_song_play, menu);
-
         MenuItem item = menu.findItem(R.id.menu_item_share);
-
         mShareActionProvider = (ShareActionProvider) item.getActionProvider();
-
 
         //TODO: add a spotify as extra text.
         Intent shareButtonIntent = new Intent(Intent.ACTION_SEND);
         shareButtonIntent.setType("text/plain");
-        String shareString = spotifyTrack.getTrackUrl();
-        shareButtonIntent.putExtra(Intent.EXTRA_SUBJECT, "A great song indeed !!");
+        String shareString = spotifyTrackList.get(trackIndex).getTrackUrl();
+        shareButtonIntent.putExtra(Intent.EXTRA_SUBJECT, TRACK_SUBJECT_MESSAGE);
         shareButtonIntent.putExtra(Intent.EXTRA_TEXT, shareString);
         if(mShareActionProvider != null){
             mShareActionProvider.setShareIntent(shareButtonIntent);
@@ -112,26 +114,15 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
         super.onPause();
 
         try {
-            // Initiating the intents for playback controls.
-            Intent playIntent = new Intent(getActivity(), SpotifyPlayerService.class).setAction("Play");
-            Intent previousIntent = new Intent(getActivity(), SpotifyPlayerService.class).
-                    setAction("Previous");
-            Intent nextIntent = new Intent(getActivity(), SpotifyPlayerService.class).setAction("Next");
-
             // Initiating the pending intents for playback controls.
-            PendingIntent playPendingIntent = PendingIntent.getService(getActivity(), 0,
-                    playIntent, 0);
-            PendingIntent previousPendingIntent = PendingIntent.getService(getActivity(), 0,
-                    previousIntent, 0);
-            PendingIntent nextPendingIntent = PendingIntent.getService(getActivity(), 0,
-                    nextIntent, 0);
-
+            PendingIntent playPendingIntent = initiateSpotifyPendingIntent(getActivity(), PLAY_ACTION);
+            PendingIntent previousPendingIntent = initiateSpotifyPendingIntent(getActivity(), PREVIOUS_ACTION);
+            PendingIntent nextPendingIntent = initiateSpotifyPendingIntent(getActivity(), NEXT_ACTION);
 
             NotificationManager nm = (NotificationManager) getActivity()
                     .getSystemService(Context.NOTIFICATION_SERVICE);
 
             Notification.Builder builder = new Notification.Builder(getActivity());
-
             RemoteViews notificationView =
                     new RemoteViews(getActivity().getPackageName(), R.layout.notification_player);
 
@@ -145,7 +136,7 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
             builder.setContent(notificationView)
                     .setSmallIcon(R.drawable.ic_skip_next_black_24dp)
                     .setOngoing(true)
-                    .setTicker("Spotify Streamer");
+                    .setTicker(SPOTIFY_STREAMER_TICKER);
 
             Notification n = builder.build();
             nm.notify(1, n);
@@ -156,12 +147,12 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
 
     }
 
-
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
+    private PendingIntent initiateSpotifyPendingIntent(Context context, String action){
+        Intent intent = new Intent(context, SpotifyPlayerService.class).setAction(
+                action);
+        PendingIntent pendingIntent = PendingIntent.getService(getActivity(), 0,
+                intent, 0);
+        return pendingIntent;
     }
 
     @Override
@@ -199,15 +190,6 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
-        Log.d(LOG_TAG, "The track is over, playing next track.");
-        mp.reset();
-        int trackIndex = spotifyPlayerService.nextTrack();
-        playerViewHolder.setViewObjects(getView(),(SpotifyTrack) spotifyTrackList.get(trackIndex));
-    }
-
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(LOG_TAG, "Creating the fragment for media player.");
@@ -220,31 +202,54 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
         playerViewHolder = new PlayerViewHolder(rootView);
         rootView.setTag(playerViewHolder);
 
-        //Setting itself as an on click listener for various play back controls..
-        if(playerViewHolder.playButtonImage != null)
-            playerViewHolder.playButtonImage.setOnClickListener(this);
-
-        if(playerViewHolder.previousButtonImage != null)
-            playerViewHolder.previousButtonImage.setOnClickListener(this);
-
-        if(playerViewHolder.nextButtonImage != null)
-            playerViewHolder.nextButtonImage.setOnClickListener(this);
+        //Setting itself as an on click listener for various play back controls.
+        setOnClickForImage(playerViewHolder.playButtonImage);
+        setOnClickForImage(playerViewHolder.previousButtonImage);
+        setOnClickForImage( playerViewHolder.nextButtonImage);
 
         // If no track id has been set we return the root view.
         spotifyTrackList = (ArrayList<SpotifyTrackComponent>)(ArrayList<?>)
-                getArguments().getParcelableArrayList("TrackList");
-        trackIndex = getArguments().getInt("TrackIndex");
-        spotifyTrack = spotifyTrackList.get(trackIndex);
+                getArguments().getParcelableArrayList(TrackListFragment.TRACK_LIST_TAG);
+        trackIndex = getArguments().getInt(TrackListFragment.TRACK_INDEX_TAG);
 
         // Setting the view objects with respect to the track.
-        playerViewHolder.setViewObjects(rootView, (SpotifyTrack)spotifyTrack);
-
-
+        playerViewHolder.setViewObjects(rootView, (SpotifyTrack) spotifyTrackList.get(trackIndex));
 
         // Setting the share intent for share button.
         setHasOptionsMenu(true);
 
+        initiateReciever();
+
+        getActivity().registerReceiver(this.playerReciever, new IntentFilter(SpotifyPlayerService.SONG_FINISHED_EVENT));
+
         return rootView;
+    }
+
+    private void initiateReciever(){
+        playerReciever = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(LOG_TAG, "The track is over, playing next track.");
+                String action = intent.getAction();
+                if(action == null) return;
+
+                if(!action.equals(SpotifyPlayerService.SONG_FINISHED_EVENT )) return;
+
+                int serviceTrackIndex = intent.getIntExtra(TrackListFragment.TRACK_INDEX_TAG, -1);
+
+                if(serviceTrackIndex == -1) return;
+
+                trackIndex = serviceTrackIndex;
+                playerViewHolder.setViewObjects(getView(), (SpotifyTrack) spotifyTrackList.get(trackIndex));
+            }
+
+        };
+    }
+
+    private void setOnClickForImage(ImageView image){
+        if(image != null)
+            image.setOnClickListener(this);
     }
 
 

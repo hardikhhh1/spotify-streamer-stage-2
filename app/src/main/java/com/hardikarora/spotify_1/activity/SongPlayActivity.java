@@ -1,14 +1,13 @@
 package com.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
-import com.hardikarora.spotify_1.R;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class SongPlayActivity extends Activity {
+import com.hardikarora.spotify_1.R;
 
-    public static final String LOG_TAG = SongPlayActivity.class.getSimpleName();
+public class SongPlayActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +47,4 @@ public class SongPlayActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-//    public class PlayerDataHolder{
-//
-//        ImageView backgroundImageView;
-//
-//
-//    }
 }

@@ -29,6 +29,7 @@ dependencies {
     // Uses this to create RESTful Requests
     compile 'com.squareup.okhttp:okhttp:2.2.0'
     // Uses this to create HTTP connections
+    compile 'com.android.support:support-v4:19.0.+'
 
 }
 
