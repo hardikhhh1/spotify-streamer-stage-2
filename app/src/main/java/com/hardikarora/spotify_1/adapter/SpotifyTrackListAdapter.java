@@ -44,7 +44,7 @@ public class SpotifyTrackListAdapter extends ArrayAdapter<SpotifyTrackComponent>
 
         if(view == null){
             view = inflater.inflate(resource, null);
-            trackViewHolder = new TrackViewHolder(view);
+            trackViewHolder = new TrackViewHolder(getContext(), view);
             view.setTag(trackViewHolder);
         } else {
             trackViewHolder = (TrackViewHolder) view.getTag();
@@ -58,14 +58,17 @@ public class SpotifyTrackListAdapter extends ArrayAdapter<SpotifyTrackComponent>
         return view;
     }
 
-    class TrackViewHolder{
+    static class TrackViewHolder{
 
         @InjectView(R.id.spotify_album_textview) TextView albumTextView;
         @InjectView(R.id.spotify_trackname_textview) TextView trackTextView;
         @InjectView(R.id.spotify_album_image) ImageView imageView;
 
-        public TrackViewHolder(View view){
-            ButterKnife.inject(view);
+        private Context mContext;
+
+        public TrackViewHolder(Context context, View view){
+            this.mContext = context;
+            ButterKnife.inject(this, view);
         }
 
         public void setHolderProperties(SpotifyTrackComponent track){
@@ -73,7 +76,7 @@ public class SpotifyTrackListAdapter extends ArrayAdapter<SpotifyTrackComponent>
             trackTextView.setText(track.getTrackName());
             String imageUrl = track.getImageUrl();
             if(imageView != null) {
-                Picasso.with(getContext()).load(imageUrl)
+                Picasso.with(mContext).load(imageUrl)
                         .into(imageView);
             }
         }
