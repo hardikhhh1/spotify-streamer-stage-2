@@ -116,7 +116,6 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
             Log.e(LOG_TAG, "Error while playing the music" + e.getMessage());
             e.printStackTrace();
         }
-
         player.prepareAsync();
     }
 
