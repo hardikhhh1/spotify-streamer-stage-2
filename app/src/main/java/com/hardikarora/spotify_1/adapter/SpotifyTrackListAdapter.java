@@ -81,7 +81,5 @@ public class SpotifyTrackListAdapter extends ArrayAdapter<SpotifyTrackComponent>
             }
         }
 
-
-
     }
 }

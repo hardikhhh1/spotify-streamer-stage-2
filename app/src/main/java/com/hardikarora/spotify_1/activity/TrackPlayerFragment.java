@@ -10,9 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,6 +51,8 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     public static final String NEXT_ACTION = "Next";
     public static final String PREVIOUS_ACTION = "Previous";
     public static final String SPOTIFY_STREAMER_TICKER = "Spotify Streamer";
+    public static final String PLAYER_PREFERENCE = "playerPreference";
+    public static final String PLAYER_PREFERENCE_KEY = PLAYER_PREFERENCE;
 
     private PlayerViewHolder playerViewHolder;
     private ShareActionProvider mShareActionProvider;
@@ -58,6 +62,7 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     int trackIndex;
 
     private BroadcastReceiver playerReciever;
+    Notification playerNotification;
 
     // A service connection to connect to the spotify api service.
     public ServiceConnection connection = new ServiceConnection() {
@@ -113,37 +118,83 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     public void onPause() {
         super.onPause();
 
-        try {
-            // Initiating the pending intents for playback controls.
-            PendingIntent playPendingIntent = initiateSpotifyPendingIntent(getActivity(), PLAY_ACTION);
-            PendingIntent previousPendingIntent = initiateSpotifyPendingIntent(getActivity(), PREVIOUS_ACTION);
-            PendingIntent nextPendingIntent = initiateSpotifyPendingIntent(getActivity(), NEXT_ACTION);
+        // Check the user preference.
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Boolean notificationPreference = preferences.getBoolean(PLAYER_PREFERENCE_KEY, true);
 
+        if(!notificationPreference) return;
+
+        try {
+            if(playerNotification == null){
+                buildNotification();
+            }
             NotificationManager nm = (NotificationManager) getActivity()
                     .getSystemService(Context.NOTIFICATION_SERVICE);
-
-            Notification.Builder builder = new Notification.Builder(getActivity());
-            RemoteViews notificationView =
-                    new RemoteViews(getActivity().getPackageName(), R.layout.notification_player);
-
-            notificationView.setOnClickPendingIntent(R.id.notification_play_btn_img,
-                     playPendingIntent);
-            notificationView.setOnClickPendingIntent(R.id.notification_prev_btn_img,
-                    previousPendingIntent);
-            notificationView.setOnClickPendingIntent(R.id.notification_next_btn_img,
-                    nextPendingIntent);
-
-            builder.setContent(notificationView)
-                    .setSmallIcon(R.drawable.ic_skip_next_black_24dp)
-                    .setOngoing(true)
-                    .setTicker(SPOTIFY_STREAMER_TICKER);
-
-            Notification n = builder.build();
-            nm.notify(1, n);
+            nm.notify(1, playerNotification);
         }
         catch (Exception e){
-            Log.e(LOG_TAG,  "Error while getting log for the player." + e.getMessage() + e.getStackTrace());
+            Log.e(LOG_TAG,  "Error while getting log for the player." + e.getMessage() +
+                    e.getStackTrace());
         }
+
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if(playerNotification == null) return;
+
+        // Cancelling the notification.
+        NotificationManager nm = (NotificationManager) getActivity()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(1);
+    }
+
+    private void buildNotification(){
+        // Initiating the pending intents for playback controls.
+        PendingIntent playPendingIntent = initiateSpotifyPendingIntent(getActivity(), PLAY_ACTION);
+        PendingIntent previousPendingIntent = initiateSpotifyPendingIntent(getActivity(), PREVIOUS_ACTION);
+        PendingIntent nextPendingIntent = initiateSpotifyPendingIntent(getActivity(), NEXT_ACTION);
+
+        Notification.Builder builder = new Notification.Builder(getActivity());
+        RemoteViews notificationView =
+                new RemoteViews(getActivity().getPackageName(), R.layout.notification_player);
+
+        notificationView.setOnClickPendingIntent(R.id.notification_play_btn_img,
+                playPendingIntent);
+        notificationView.setOnClickPendingIntent(R.id.notification_prev_btn_img,
+                previousPendingIntent);
+        notificationView.setOnClickPendingIntent(R.id.notification_next_btn_img,
+                nextPendingIntent);
+
+        builder.setContent(notificationView)
+                .setSmallIcon(R.drawable.ic_skip_next_black_24dp)
+                .setOngoing(true)
+                .setTicker(SPOTIFY_STREAMER_TICKER);
+
+        playerNotification = builder.build();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        // Canceling the notification.
+        if(playerNotification != null) {
+            NotificationManager nm = (NotificationManager) getActivity()
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.cancel(1);
+        }
+
+        // Unregistering the reciever.
+        getActivity().unregisterReceiver(this.playerReciever);
+
+        // Unbinding and clearing the service.
+        getActivity().unbindService(connection);
+        Intent intent = new Intent(getActivity(), SpotifyPlayerService.class);
+        getActivity().stopService(intent);
 
     }
 
@@ -188,6 +239,7 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
         }
 
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
