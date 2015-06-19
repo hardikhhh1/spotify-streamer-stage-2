@@ -24,6 +24,7 @@ import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import com.hardikarora.spotify_1.util.AsyncResponse;
 import com.hardikarora.spotify_1.util.SpotifyApiUtility;
 import com.hardikarora.spotify_1.util.SpotifyAsyncTask;
+import com.hardikarora.spotify_1.util.SpotifyPlayerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,9 +74,30 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
         setHasOptionsMenu(true);
     }
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        MenuItem item = menu.findItem(R.id.now_playing_button);
+        item.setVisible(false);
+        SpotifyPlayerService.PlayerState state = SpotifyPlayerService.spotifyPlayerState;
+
+        if(state == SpotifyPlayerService.PlayerState.Play){
+            item.setVisible(true);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        MenuItem item = menu.findItem(R.id.now_playing_button);
+        item.setVisible(false);
+        SpotifyPlayerService.PlayerState state = SpotifyPlayerService.spotifyPlayerState;
+
+        if(state == SpotifyPlayerService.PlayerState.Play){
+            item.setVisible(true);
+        }
     }
 
     @Override
@@ -142,6 +164,8 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
         artistList.addAll(input);
         spotifyArtistListAdapter.notifyDataSetChanged();
     }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

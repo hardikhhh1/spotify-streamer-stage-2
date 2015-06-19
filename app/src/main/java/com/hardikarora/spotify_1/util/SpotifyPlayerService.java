@@ -23,17 +23,17 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
 
     public static final String SONG_FINISHED_EVENT = "song-finished-event";
 
-    private enum PlayerState {
+    public enum PlayerState {
         Play, Stopped, Paused ;
     }
 
     // The state is set to stopped when the service is started.
-    private static PlayerState spotifyPlayerState = PlayerState.Stopped;
+    public static PlayerState spotifyPlayerState = PlayerState.Stopped;
 
     private MediaPlayer player;
 
-    public List<SpotifyTrackComponent> spotifyTrackList;
-    public int trackIndex;
+    public static List<SpotifyTrackComponent> spotifyTrackList;
+    public static int trackIndex;
     public int previousTrackIndex;
 
     private final IBinder mBinder = new SpotifyBinder();

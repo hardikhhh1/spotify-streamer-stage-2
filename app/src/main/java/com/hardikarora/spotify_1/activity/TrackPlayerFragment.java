@@ -87,6 +87,7 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if(spotifyPlayerService != null) return;
         // Initiate the service.
         Intent intent = new Intent(getActivity(), SpotifyPlayerService.class);
         getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -97,8 +98,9 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         MenuItem item = menu.findItem(R.id.menu_item_share);
+        if(item == null) return;
         mShareActionProvider = (ShareActionProvider) item.getActionProvider();
-
+        if(mShareActionProvider == null) return;
         //TODO: add a spotify as extra text.
         Intent shareButtonIntent = new Intent(Intent.ACTION_SEND);
         shareButtonIntent.setType("text/plain");
@@ -117,6 +119,7 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(LOG_TAG, "On pause for player fragment called");
 
         // Check the user preference.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -143,7 +146,7 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     @Override
     public void onResume() {
         super.onResume();
-
+        Log.d(LOG_TAG, "On resume for player fragment called");
         if(playerNotification == null) return;
 
         // Cancelling the notification.
@@ -180,6 +183,7 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(LOG_TAG, "On destroy for player fragment called");
 
         // Canceling the notification.
         if(playerNotification != null) {
