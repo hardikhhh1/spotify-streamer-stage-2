@@ -52,6 +52,7 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     FetchSpotifyArtistData fetchSpotifyData;
     AsyncResponse fetchResponse = this;
     SpotifyApiUtility utility;
+    MenuItem nowPlayingMenuItem;
 
     @InjectView(R.id.spotify_search_text) EditText searchText;
     @InjectView(R.id.list_view_spotify) ListView spotifyListView;
@@ -78,25 +79,24 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        MenuItem item = menu.findItem(R.id.now_playing_button);
-        item.setVisible(false);
+        nowPlayingMenuItem = menu.findItem(R.id.now_playing_button);
+        nowPlayingMenuItem.setVisible(false);
         SpotifyPlayerService.PlayerState state = SpotifyPlayerService.spotifyPlayerState;
 
         if(state == SpotifyPlayerService.PlayerState.Play){
-            item.setVisible(true);
+            nowPlayingMenuItem.setVisible(true);
         }
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
+    public void onResume() {
+        super.onResume();
 
-        MenuItem item = menu.findItem(R.id.now_playing_button);
-        item.setVisible(false);
+        // Check if now playing button is needed.
+        if(nowPlayingMenuItem == null) return;
         SpotifyPlayerService.PlayerState state = SpotifyPlayerService.spotifyPlayerState;
-
         if(state == SpotifyPlayerService.PlayerState.Play){
-            item.setVisible(true);
+            nowPlayingMenuItem.setVisible(true);
         }
     }
 
