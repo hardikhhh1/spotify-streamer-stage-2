@@ -11,6 +11,12 @@
             android:entryValues="@array/country_codes"
             android:dialogTitle="@string/title_country_code" />
 
+        <SwitchPreference
+            android:key="playerPreference"
+            android:title="@string/notification_player"
+            android:switchTextOn="@string/notification_player_on"
+            android:switchTextOff="@string/notification_player_off"/>
+
     </PreferenceCategory>
 
 

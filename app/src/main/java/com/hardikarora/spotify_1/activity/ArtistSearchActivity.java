@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.menu.PreferenceMenuActivity;
 
 
 public class ArtistSearchActivity extends Activity {
@@ -39,7 +40,7 @@ public class ArtistSearchActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_country_code) {
-            Intent intent = new Intent(this, CountryCodeActivity.class);
+            Intent intent = new Intent(this, PreferenceMenuActivity.class);
             startActivity(intent);
             return true;
         }

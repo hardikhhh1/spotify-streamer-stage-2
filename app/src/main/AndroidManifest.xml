@@ -31,7 +31,7 @@
         <service android:name=".util.SpotifyPlayerService" />
 
         <activity
-            android:name=".activity.CountryCodeActivity"
+            android:name=".menu.PreferenceMenuActivity"
             android:label="@string/title_activity_country_code" >
         </activity>
     </application>

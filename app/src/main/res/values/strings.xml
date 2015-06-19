@@ -9,6 +9,11 @@
     <string name="title_activity_song_play">SongPlayActivity</string>
     <string name="preferences_title">Preferences</string>
     <string name="title_country_code">Country Code</string>
+    <string name="notification_player">Notification Player</string>
+    <string name="notification_player_summary_on">Player will be shown on notification bar</string>
+    <string name="notification_player_summary_off">Player will not be shown on notification bar</string>
+    <string name="notification_player_on">Player will be shown on notification bar</string>
+    <string name="notification_player_off">Player will not be shown on notification bar</string>
 
     <string name="title_activity_country_code">CountryCodeActivity</string>
 </resources>
