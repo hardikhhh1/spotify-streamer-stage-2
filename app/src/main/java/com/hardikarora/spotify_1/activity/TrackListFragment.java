@@ -1,6 +1,7 @@
 package com.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -37,6 +38,8 @@ import butterknife.InjectView;
 public class TrackListFragment extends Fragment implements AsyncResponse {
 
     private static final String LOG_TAG =  TrackListFragment.class.getSimpleName();
+
+    private static final String STATE_ACTIVATED_POSITION = "activated_position";
     private static final String NO_TOP_TRACKS =  "Found no top tracks for the artist";
 
     public static final String TAG =  TrackListFragment.class.getSimpleName();
@@ -44,6 +47,11 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     public static final String SPOTIFY_TRACK_ID_TAG = "SpotifyTrackId";
     public static final String TRACK_INDEX_TAG = "TrackIndex";
     public static final String TRACK_LIST_TAG = "TrackList";
+
+    /**
+     * Current activated item position, only used in tablets.
+     */
+    private int mActivatedPosition = ListView.INVALID_POSITION;
 
     List<SpotifyTrackComponent> topTracks;
     SpotifyTrackListAdapter spotifyTrackListAdapter;
@@ -87,6 +95,11 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        if (mActivatedPosition != ListView.INVALID_POSITION) {
+            // Serialize and persist the activated item position.
+            outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+        }
+
         // To save the state we write all the artist list
         // in a parcelable list.
         ArrayList<Parcelable> parcelableList = new ArrayList<>();
@@ -124,9 +137,42 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
 
     }
 
+
+    /**
+     * Turns on activate-on-click mode. When this mode is on, list items will be
+     * given the 'activated' state when touched.
+     */
+//    public void setActivateOnItemClick(boolean activateOnItemClick) {
+//        // When setting CHOICE_MODE_SINGLE, ListView will automatically
+//        // give items the 'activated' state when touched.
+//        getListView().setChoiceMode(activateOnItemClick
+//                ? ListView.CHOICE_MODE_SINGLE
+//                : ListView.CHOICE_MODE_NONE);
+//    }
+
+
+
+//    private void setActivatedPosition(int position) {
+//        // If the position is invalud, we set the item checked as false
+//        if (position == ListView.INVALID_POSITION) {
+//            getListView().setItemChecked(mActivatedPosition, false);
+//        } else {
+//            // If the position is valid we set it as true.
+//            getListView().setItemChecked(position, true);
+//        }
+//
+//        mActivatedPosition = position;
+//    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        if (savedInstanceState != null
+                && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
+//            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_artist_details, container, false);
 
         ButterKnife.inject(this, rootView);

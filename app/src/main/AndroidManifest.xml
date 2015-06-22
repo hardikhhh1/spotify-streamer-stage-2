@@ -22,6 +22,9 @@
         <activity
             android:name=".activity.ArtistTopTracksActivity"
             android:label="@string/title_activity_artist_details" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.ArtistSearchActivity"/>
         </activity>
         <activity
             android:name=".activity.SongPlayActivity"

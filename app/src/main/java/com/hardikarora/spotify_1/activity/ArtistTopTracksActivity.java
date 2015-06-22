@@ -28,7 +28,7 @@ public class ArtistTopTracksActivity extends Activity{
             fragment.setArguments(getIntent().getExtras());
 
             getFragmentManager().beginTransaction()
-                    .replace(R.id.container, fragment, TrackListFragment.TAG)
+                    .replace(R.id.top_tracks_container, fragment, TrackListFragment.TAG)
                     .commit();
         }
     }

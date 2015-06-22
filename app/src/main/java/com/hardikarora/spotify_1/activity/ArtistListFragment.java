@@ -1,5 +1,6 @@
 package com.hardikarora.spotify_1.activity;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -54,6 +55,8 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     SpotifyApiUtility utility;
     MenuItem nowPlayingMenuItem;
 
+    private Callbacks mCallbacks;
+
     @InjectView(R.id.spotify_search_text) EditText searchText;
     @InjectView(R.id.list_view_spotify) ListView spotifyListView;
 
@@ -73,6 +76,26 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // Activities containing this fragment must implement its callbacks.
+        if (!(activity instanceof Callbacks)) {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+        }
+
+        mCallbacks = (Callbacks) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        // Reset the active callbacks interface to the dummy implementation.
+        mCallbacks = null;
     }
 
 
@@ -186,12 +209,13 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // When an item in the list, that is, the artist name is clicked on the UI
                 // a new intent is started to display the top tracks.
-                SpotifyTrackComponent artist = artistList.get(position);
-                String artistId = artist.getArtistId();
-                Intent intent = new Intent(getActivity(), ArtistTopTracksActivity.class);
-                intent.putExtra(Intent.EXTRA_TEXT, artistId);
-                intent.putExtra(ARTIST_IMAGE_TEXT, artist.getImageUrl());
-                startActivity(intent);
+
+                if(mCallbacks != null){
+                    SpotifyTrackComponent artist = artistList.get(position);
+                    String artistId = artist.getArtistId();
+                    mCallbacks.onListItemSelected(artistId, artist.getImageUrl());
+                }
+
             }
         });
         utility = new SpotifyApiUtility(getActivity());
@@ -259,8 +283,15 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
                         " data in the task : " + e.getMessage());
             }
 
+
             return spotifyTrackComponents;
         }
+
+    }
+
+    public interface Callbacks{
+
+        public void onListItemSelected(String artistId, String imageUrl);
 
     }
 
