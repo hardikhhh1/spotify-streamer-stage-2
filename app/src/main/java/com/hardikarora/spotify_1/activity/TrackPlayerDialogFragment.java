@@ -1,6 +1,9 @@
 package com.hardikarora.spotify_1.activity;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,7 +14,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
@@ -22,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.ShareActionProvider;
@@ -42,10 +45,10 @@ import butterknife.InjectView;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TrackPlayerFragment extends Fragment implements View.OnClickListener{
+public class TrackPlayerDialogFragment extends DialogFragment implements View.OnClickListener{
 
-    public static final String TAG = TrackPlayerFragment.class.getSimpleName();
-    public static final String LOG_TAG = TrackPlayerFragment.class.getSimpleName();
+    public static final String TAG = TrackPlayerDialogFragment.class.getSimpleName();
+    public static final String LOG_TAG = TrackPlayerDialogFragment.class.getSimpleName();
     public static final String TRACK_SUBJECT_MESSAGE = "A great song indeed !!";
     public static final String PLAY_ACTION = "Play";
     public static final String NEXT_ACTION = "Next";
@@ -79,9 +82,23 @@ public class TrackPlayerFragment extends Fragment implements View.OnClickListene
         }
     };
 
-    public static TrackPlayerFragment newInstance(){
-        return new TrackPlayerFragment();
+    public static TrackPlayerDialogFragment newInstance(){
+        return new TrackPlayerDialogFragment();
     }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        // The only reason you might override this method when using onCreateView() is
+        // to modify any dialog characteristics. For example, the dialog includes a
+        // title by default, but your custom layout might not need it. So here you can
+        // remove the dialog title, but you must call the superclass to get the Dialog.
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
+    }
+
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

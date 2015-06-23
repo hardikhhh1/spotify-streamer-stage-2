@@ -1,6 +1,8 @@
 package com.hardikarora.spotify_1.activity;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -138,32 +140,6 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     }
 
 
-    /**
-     * Turns on activate-on-click mode. When this mode is on, list items will be
-     * given the 'activated' state when touched.
-     */
-//    public void setActivateOnItemClick(boolean activateOnItemClick) {
-//        // When setting CHOICE_MODE_SINGLE, ListView will automatically
-//        // give items the 'activated' state when touched.
-//        getListView().setChoiceMode(activateOnItemClick
-//                ? ListView.CHOICE_MODE_SINGLE
-//                : ListView.CHOICE_MODE_NONE);
-//    }
-
-
-
-//    private void setActivatedPosition(int position) {
-//        // If the position is invalud, we set the item checked as false
-//        if (position == ListView.INVALID_POSITION) {
-//            getListView().setItemChecked(mActivatedPosition, false);
-//        } else {
-//            // If the position is valid we set it as true.
-//            getListView().setItemChecked(position, true);
-//        }
-//
-//        mActivatedPosition = position;
-//    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -189,13 +165,28 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
         topTracksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bundle bundle = new Bundle();
                 SpotifyTrackComponent selectedTrack = topTracks.get(position);
-                Intent intent = new Intent(getActivity(), SongPlayActivity.class);
-                intent.putParcelableArrayListExtra(TRACK_LIST_TAG, (ArrayList<SpotifyTrack>)
+                bundle.putParcelableArrayList(TRACK_LIST_TAG, (ArrayList<SpotifyTrack>)
                         (ArrayList<?>)topTracks);
-                intent.putExtra(TRACK_INDEX_TAG, position);
-                intent.putExtra(SPOTIFY_TRACK_ID_TAG, selectedTrack.getTrackId());
-                startActivity(intent);
+                bundle.putInt(TRACK_INDEX_TAG, position);
+                bundle.putString(SPOTIFY_TRACK_ID_TAG, selectedTrack.getTrackId());
+                FragmentManager manager = getFragmentManager();
+                TrackPlayerDialogFragment trackPlayerDialogFragment = new TrackPlayerDialogFragment();
+                trackPlayerDialogFragment.setArguments(bundle);
+                if (getActivity().findViewById(R.id.top_tracks_container) != null
+                        && getActivity().findViewById(R.id.container) != null){
+                    trackPlayerDialogFragment.show(manager, "Spotify player");
+                    } else {
+
+                    FragmentTransaction transaction = manager.beginTransaction();
+                    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    transaction.replace(R.id.container, trackPlayerDialogFragment,
+                            TrackPlayerDialogFragment.TAG)
+                            .commit();
+
+                    }
+
             }
         });
 

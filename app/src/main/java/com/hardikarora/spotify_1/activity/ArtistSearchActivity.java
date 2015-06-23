@@ -35,18 +35,8 @@ implements ArtistListFragment.Callbacks {
 //            If the activity top track layout is not null then it means,
 //            the view is in two pane mode.
             mTwoPane = true;
-
-//            ((TrackListFragment) getFragmentManager().findFragmentById(R.id.album_list_view))
-//                    .setAc
         }
 
-
-//        if (savedInstanceState == null) {
-//            getFragmentManager().beginTransaction()
-//                    .replace(R.id.container, ArtistListFragment.newInstance(),
-//                            ArtistListFragment.TAG)
-//                    .commit();
-//        }
     }
 
     @Override
@@ -85,6 +75,8 @@ implements ArtistListFragment.Callbacks {
 
                 int trackIndex = SpotifyPlayerService.trackIndex;
 
+
+                // TODO : Show as an dialog.
                 Bundle arguments = new Bundle();
                 arguments.putParcelableArrayList(TrackListFragment.TRACK_LIST_TAG,
                         (ArrayList<SpotifyTrack>)
@@ -94,11 +86,11 @@ implements ArtistListFragment.Callbacks {
                 arguments.putString(TrackListFragment.SPOTIFY_TRACK_ID_TAG,
                         trackList.get(trackIndex).getTrackId());
 
-                TrackPlayerFragment fragment = TrackPlayerFragment.newInstance();
+                TrackPlayerDialogFragment fragment = TrackPlayerDialogFragment.newInstance();
                 fragment.setArguments(arguments);
 
                 getFragmentManager().beginTransaction()
-                        .replace(R.id.container, fragment, TrackPlayerFragment.TAG)
+                        .replace(R.id.container, fragment, TrackPlayerDialogFragment.TAG)
                         .commit();
 
 
