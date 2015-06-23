@@ -30,7 +30,7 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     // The state is set to stopped when the service is started.
     public static PlayerState spotifyPlayerState = PlayerState.Stopped;
 
-    private MediaPlayer player;
+    private static MediaPlayer player;
 
     public static List<SpotifyTrackComponent> spotifyTrackList;
     public static int trackIndex;
@@ -161,4 +161,19 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
         public SpotifyPlayerService getService(){ return SpotifyPlayerService.this; }
     }
 
+    public static PlayerState getSpotifyPlayerState() {
+        return spotifyPlayerState;
+    }
+
+    public static void setSpotifyPlayerState(PlayerState spotifyPlayerState) {
+        SpotifyPlayerService.spotifyPlayerState = spotifyPlayerState;
+    }
+
+    public static MediaPlayer getPlayer() {
+        return player;
+    }
+
+    public static void setPlayer(MediaPlayer player) {
+        SpotifyPlayerService.player = player;
+    }
 }
