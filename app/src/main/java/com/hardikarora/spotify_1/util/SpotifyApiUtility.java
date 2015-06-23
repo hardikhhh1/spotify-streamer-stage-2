@@ -17,6 +17,7 @@ import java.util.Map;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.ArtistSimple;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 import kaaes.spotify.webapi.android.models.Image;
 import kaaes.spotify.webapi.android.models.Track;
@@ -92,40 +93,22 @@ public class SpotifyApiUtility{
             return spotifyTracks;
 
         SpotifyTrack spotifyTrack;
+        String artistName = "";
         if(tracks.tracks.size() > 0){
             for(Track track : tracks.tracks){
-                spotifyTrack = new SpotifyTrack(track);
+                if(artistName.equals("")){
+                    List<ArtistSimple> artistList = track.artists;
+                    for(ArtistSimple artist : artistList){
+                        if(artistID.equals(artist.id)){
+                            artistName = artist.name;
+                        }
+                    }
+                }
+                spotifyTrack = new SpotifyTrack(track, artistName);
                 spotifyTracks.add(spotifyTrack);
             }
         }
         return spotifyTracks;
-    }
-
-
-    /**
-     * Helper function to get the track for the given Track id.
-     * @param trackId: String representing te track id of the Track.
-     * @param imageSize: The size of the image for the track.
-     * @return {@link kaaes.spotify.webapi.android.models.Track}
-     */
-    public SpotifyTrackComponent getTrackFromSpotify(String trackId, int imageSize){
-        SpotifyApi spotifyApi = new SpotifyApi();
-        SpotifyService service = spotifyApi.getService();
-        Map<String, Object> apiOptions = new HashMap<>();
-        apiOptions.put(COUNTRY_TOKEN, getCountryCode());
-        Track track = service.getTrack(trackId, apiOptions);
-        SpotifyTrackComponent trackComponent = new SpotifyTrack(track, imageSize);
-        return trackComponent;
-    }
-
-    /**
-     * Helper function to get the track for the given Track id. THe image size is taken
-     * default.
-     * @param trackId: String representing te track id of the Track.
-     * @return {@link kaaes.spotify.webapi.android.models.Track}
-     */
-    public SpotifyTrackComponent getTrackFromSpotify(String trackId){
-        return this.getTrackFromSpotify(trackId, SpotifyTrack.DEFAULT_IMAGE_SIZE);
     }
 
 

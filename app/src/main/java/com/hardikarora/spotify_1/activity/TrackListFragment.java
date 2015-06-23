@@ -144,11 +144,6 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if (savedInstanceState != null
-                && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-//            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-        }
-
         View rootView = inflater.inflate(R.layout.fragment_artist_details, container, false);
 
         ButterKnife.inject(this, rootView);
@@ -216,9 +211,9 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
         @Override
         protected List<SpotifyTrackComponent> doInBackground(Object[] params) {
             List<SpotifyTrackComponent> spotifyTracks;
-            String artistName = (String) params[0];
+            String artistId = (String) params[0];
             try {
-                spotifyTracks = utility.getArtistsTopTracks(artistName);
+                spotifyTracks = utility.getArtistsTopTracks(artistId);
             } catch (Exception e){
                 Log.e(LOG_TAG, "Error occured while getting top tracks : " + e.toString()
                         + e.getMessage());

@@ -18,35 +18,38 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
 
     private String trackName;
     private String albumName;
+    private String artistName;
     private String imageUrl;
     private String trackId;
     private String trackUrl;
 
-    public SpotifyTrack(String albumName, String trackName, String imageUrl,
+    public SpotifyTrack(String albumName, String trackName,  String artistName, String imageUrl,
                         String trackId, String trackUrl) {
         this.setAlbumName(albumName);
         this.setTrackName(trackName);
         this.setImageUrl(imageUrl);
         this.setTrackId(trackId);
         this.setTrackUrl(trackUrl);
+        this.setArtistName(artistName);
     }
 
 
-    public SpotifyTrack(Track spotifyTrack, int imageSize) {
-        this(spotifyTrack.album.name, spotifyTrack.name,
+    public SpotifyTrack(Track spotifyTrack, String artistName, int imageSize) {
+        this(spotifyTrack.album.name, spotifyTrack.name, artistName,
                 new SpotifyApiUtility(null).findImageUrl(spotifyTrack.album.images, imageSize),
                 spotifyTrack.id, spotifyTrack.preview_url);
     }
 
 
-    public SpotifyTrack(Track spotifyTrack) {
-        this(spotifyTrack, DEFAULT_IMAGE_SIZE);
+    public SpotifyTrack(Track spotifyTrack, String artistName) {
+        this(spotifyTrack,artistName,  DEFAULT_IMAGE_SIZE);
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.albumName);
         dest.writeString(this.trackName);
+        dest.writeString(this.artistName);
         dest.writeString(this.imageUrl);
         dest.writeString(this.trackId);
         dest.writeString(this.trackUrl);
@@ -56,12 +59,17 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
         @Override
         public SpotifyTrack createFromParcel(Parcel source) {
             return new SpotifyTrack(source.readString(), source.readString(),
-                    source.readString(), source.readString(), source.readString());
+                    source.readString(), source.readString(), source.readString(),
+                    source.readString());
         }
 
         @Override
         public SpotifyTrack[] newArray(int size) { return new SpotifyTrack[size]; }
     };
+
+    public String getArtistName() { return this.artistName; }
+
+    public void setArtistName(String artistName) { this.artistName = artistName; }
 
     public int describeContents() { return 0; }
 
