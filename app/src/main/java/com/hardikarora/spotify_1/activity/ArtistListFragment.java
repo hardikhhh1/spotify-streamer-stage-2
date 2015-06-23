@@ -44,7 +44,7 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     private static final String LOG_TAG = ArtistListFragment.class.getSimpleName();
 
     public static final String TAG = ArtistListFragment.class.getSimpleName();
-    public static final String NO_ALBUM_TOAST = "Couldn't find the artist/album.";
+    public static final String NO_ALBUM_TOAST = "Couldn't find the artist, please try different name.";
     public static final String ARTISTS_TAG = "Artists";
     public static final String ARTIST_IMAGE_TEXT = "ArtistImage";
 

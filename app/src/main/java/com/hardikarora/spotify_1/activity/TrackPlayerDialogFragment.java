@@ -2,8 +2,6 @@ package com.hardikarora.spotify_1.activity;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -335,6 +333,8 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
         @InjectView(R.id.player_album_image) ImageView albumImageView;
         @InjectView(R.id.player_album_name_textview) TextView albumNameTextView;
         @InjectView(R.id.player_artist_name_textview) TextView artistNameTextView;
+        @InjectView(R.id.player_track_name_textview) TextView trackNameTextView;
+
 
         public PlayerViewHolder(View view){
             ButterKnife.inject(this, view);
@@ -343,7 +343,8 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
         public void setViewObjects(View view, SpotifyTrack spotifyTrack)
         {
             if(albumNameTextView != null) albumNameTextView.setText(spotifyTrack.getAlbumName());
-            if(artistNameTextView != null) artistNameTextView.setText(spotifyTrack.getTrackName());
+            if(artistNameTextView != null) artistNameTextView.setText(spotifyTrack.getArtistName());
+            if(trackNameTextView != null) trackNameTextView.setText(spotifyTrack.getTrackName());
             if(albumImageView != null){
                 // Load image with picasso.
                 Log.d(LOG_TAG, "Loading the background image with picasso.");

@@ -20,14 +20,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Song Name"
+        android:text="Album Name"
         android:id="@+id/player_album_name_textview"
         android:layout_below="@id/player_artist_name_textview"
         android:gravity="center" />
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="300dp"
         android:layout_below="@id/player_album_name_textview"
         android:id="@+id/player_album_image"/>
 
@@ -40,11 +40,24 @@
         android:layout_below="@id/player_album_image"
         android:gravity="center" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seek_bar_layout"
+        android:layout_below="@+id/player_track_name_textview">
+
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/seek_bar"/>
+
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/player_track_name_textview">
+        android:layout_below="@id/seek_bar_layout">
 
             <ImageView
                 android:layout_width="wrap_content"
