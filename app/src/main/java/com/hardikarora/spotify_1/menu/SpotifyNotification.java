@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.widget.RemoteViews;
 
 import com.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.activity.TrackPlayerDialogFragment;
 import com.hardikarora.spotify_1.model.SpotifyTrack;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import com.hardikarora.spotify_1.service.ServiceSubscriber;
@@ -24,26 +25,26 @@ import java.io.IOException;
 public class SpotifyNotification implements ServiceSubscriber {
 
     public static final int NOTIFICATION_ID = 1;
-    SpotifyPlayerService service = new SpotifyPlayerService().getInstance();
-
     public static final String PLAY_ACTION = "Play";
     public static final String NEXT_ACTION = "Next";
     public static final String PREVIOUS_ACTION = "Previous";
-    public static final String SPOTIFY_STREAMER_TICKER = "Spotify Streamer";
 
-    Context mContext;
-    SpotifyTrack track;
-    static Notification notification;
-    static RemoteViews notificationView;
+    private static final String SPOTIFY_STREAMER_TICKER = "Spotify Streamer";
+    private Context mContext;
+    private SpotifyTrack track;
+
+    private Notification notification;
+    private RemoteViews notificationView;
 
     public SpotifyNotification(Context mContext,
                                SpotifyTrack track){
         this.track = track;
         this.mContext = mContext;
-        if(service != null){
-            service.subscribe(this);
+        if(TrackPlayerDialogFragment.spotifyPlayerService != null){
+            TrackPlayerDialogFragment.spotifyPlayerService.subscribe(this);
         }
     }
+
     @Override
     public void stateChanged(SpotifyTrackComponent component) {
         if(notificationView != null){
@@ -59,7 +60,7 @@ public class SpotifyNotification implements ServiceSubscriber {
     }
 
     public void startNotification(){
-        if(track == null) return;
+        if(track == null || TrackPlayerDialogFragment.spotifyPlayerService == null) return;
         NotificationManager nm = (NotificationManager) mContext
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = buildNotification();
@@ -73,12 +74,11 @@ public class SpotifyNotification implements ServiceSubscriber {
     }
 
 
-    public Notification buildNotification(){
-        if(track == null) return null;
+    private Notification buildNotification(){
         return buildNotification(track.getTrackName(), track.getImageUrl());
     }
 
-    public Notification buildNotification(final String trackName,final String imageUrl){
+    private Notification buildNotification(final String trackName,final String imageUrl){
         // Initiating the pending intents for playback controls.
         PendingIntent playPendingIntent = initiateSpotifyPendingIntent(mContext, PLAY_ACTION);
         PendingIntent previousPendingIntent = initiateSpotifyPendingIntent(mContext, PREVIOUS_ACTION);
@@ -125,8 +125,6 @@ public class SpotifyNotification implements ServiceSubscriber {
                 .setSmallIcon(R.drawable.ic_skip_next_black_24dp)
                 .setOngoing(true)
                 .setTicker(SPOTIFY_STREAMER_TICKER);
-
-
 
         Notification playerNotification = builder.build();
         playerNotification.bigContentView = notificationView;

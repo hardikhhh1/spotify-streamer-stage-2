@@ -65,11 +65,11 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     private PlayerViewHolder playerViewHolder;
     private ShareActionProvider mShareActionProvider;
 
+    public static SpotifyPlayerService spotifyPlayerService;
 
     SeekBar playerSeekBar;
     TextView playerStartTime;
     TextView playerEndTime;
-    SpotifyPlayerService spotifyPlayerService;
     Handler seekHandler = new Handler();
     SpotifyNotification spotifyNotification;
 
