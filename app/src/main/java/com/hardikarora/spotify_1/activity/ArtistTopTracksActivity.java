@@ -12,7 +12,7 @@ import com.hardikarora.spotify_1.R;
 This class represents the activity to show the top tracks for
 an artist.
  */
-public class ArtistTopTracksActivity extends Activity{
+public class ArtistTopTracksActivity extends SpotifyBaseActivity{
 
     /**
      * Overriding the oncreate method, called when the view is created.
@@ -39,21 +39,5 @@ public class ArtistTopTracksActivity extends Activity{
         getMenuInflater().inflate(R.menu.menu_artist_details, menu);
         return true;
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
 
 }

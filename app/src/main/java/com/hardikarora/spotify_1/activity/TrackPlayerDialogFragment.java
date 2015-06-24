@@ -134,6 +134,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         MenuItem item = menu.findItem(R.id.menu_item_share);
         if(item == null) return;
+        item.setVisible(true);
         mShareActionProvider = (ShareActionProvider) item.getActionProvider();
         if(mShareActionProvider == null) return;
         //TODO: add a spotify as extra text.
