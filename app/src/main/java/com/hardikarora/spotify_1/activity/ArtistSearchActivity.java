@@ -37,22 +37,6 @@ implements ArtistListFragment.Callbacks {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem item = menu.findItem(R.id.now_playing_button);
-        item.setVisible(false);
-        SpotifyPlayerService.PlayerState state = SpotifyPlayerService.spotifyPlayerState;
-
-        if(state == SpotifyPlayerService.PlayerState.Play){
-            item.setVisible(true);
-        }
-        return true;
-    }
-
-
-
 
     @Override
     public void onListItemSelected(String artistId, String imageUrl) {

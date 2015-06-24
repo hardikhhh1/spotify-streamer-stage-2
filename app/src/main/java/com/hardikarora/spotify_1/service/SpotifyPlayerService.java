@@ -7,10 +7,8 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 
 import com.hardikarora.spotify_1.activity.TrackListFragment;
-import com.hardikarora.spotify_1.activity.TrackPlayerDialogFragment;
 import com.hardikarora.spotify_1.menu.SpotifyNotification;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 
@@ -26,13 +24,6 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
 
     public static final String SONG_FINISHED_EVENT = "song-finished-event";
 
-    public SpotifyPlayerService getInstance(){
-        if(player != null){
-            return SpotifyPlayerService.this;
-        }
-        return null;
-    }
-
     public enum PlayerState {
         Play, Stopped, Paused ;
     }
@@ -45,6 +36,7 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     private static MediaPlayer player;
 
     public static List<SpotifyTrackComponent> spotifyTrackList;
+    public static SpotifyTrackComponent nowPlayingSpotifyTrack;
     public static int trackIndex;
     public int previousTrackIndex;
 
@@ -74,12 +66,18 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     public void playButtonPressed(){
 
         if(spotifyPlayerState == PlayerState.Play){
+            if(spotifyTrackList.get(trackIndex) == nowPlayingSpotifyTrack){
+                player.pause();
+                spotifyPlayerState = PlayerState.Paused;
+            }
             previousTrackIndex = trackIndex;
-            player.pause();
-            spotifyPlayerState = PlayerState.Paused;
-        } else if(spotifyPlayerState == PlayerState.Paused && previousTrackIndex == trackIndex){
-            player.start();
-            spotifyPlayerState = PlayerState.Play;
+
+
+        } else if(spotifyPlayerState == PlayerState.Paused){
+            if(spotifyTrackList.get(trackIndex) == nowPlayingSpotifyTrack) {
+                player.start();
+                spotifyPlayerState = PlayerState.Play;
+            }
         }
 
         resetAndPlayTrack();
@@ -118,7 +116,7 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     }
 
     private void resetAndPlayTrack(){
-        String  spotifyTrackUrl = spotifyTrackList.get(trackIndex).getTrackUrl();
+        String spotifyTrackUrl = spotifyTrackList.get(trackIndex).getTrackUrl();
         player.stop();
         player.reset();
         playTrack(spotifyTrackUrl);
@@ -132,6 +130,7 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
             Log.e(LOG_TAG, "Error while playing the music" + e.getMessage());
             e.printStackTrace();
         }
+        nowPlayingSpotifyTrack = spotifyTrackList.get(trackIndex);
         player.prepareAsync();
     }
 

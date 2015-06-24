@@ -153,44 +153,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
 
     @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG, "On pause for player fragment called");
-
-        // Check the user preference.
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        Boolean notificationPreference = preferences.getBoolean(PLAYER_PREFERENCE_KEY, true);
-
-        if(!notificationPreference) return;
-
-
-        try {
-            if(spotifyNotification == null){
-                 spotifyNotification= new SpotifyNotification(getActivity(),
-                        (SpotifyTrack) spotifyTrackList.get(trackIndex));
-                 spotifyNotification.startNotification();
-            }
-        }
-        catch (Exception e){
-            Log.e(LOG_TAG,  "Error while getting log for the player." + e.getMessage() +
-                    e.getStackTrace());
-        }
-
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "On resume for player fragment called");
-        if(spotifyNotification == null) return;
-
-        // Cancelling the notification.
-        spotifyNotification.cancelNotification();
-    }
-
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(LOG_TAG, "On destroy for player fragment called");
@@ -372,6 +334,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
             if(artistNameTextView != null) artistNameTextView.setText(spotifyTrack.getArtistName());
             if(trackNameTextView != null) trackNameTextView.setText(spotifyTrack.getTrackName());
             if(albumImageView != null){
+                if(view == null) return;
                 // Load image with picasso.
                 Log.d(LOG_TAG, "Loading the background image with picasso.");
                 Picasso.with(view.getContext()).load(spotifyTrack.getImageUrl()).into(albumImageView);
