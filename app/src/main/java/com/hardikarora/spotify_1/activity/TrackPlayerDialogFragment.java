@@ -12,7 +12,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -33,11 +35,14 @@ import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.hardikarora.spotify_1.R;
+import com.hardikarora.spotify_1.menu.SpotifyNotification;
 import com.hardikarora.spotify_1.model.SpotifyTrack;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import com.hardikarora.spotify_1.util.SpotifyPlayerService;
+import com.hardikarora.spotify_1.service.ServiceSubscriber;
+import com.hardikarora.spotify_1.service.SpotifyPlayerService;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +53,8 @@ import butterknife.InjectView;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TrackPlayerDialogFragment extends DialogFragment implements View.OnClickListener{
+public class TrackPlayerDialogFragment extends DialogFragment implements View.OnClickListener,
+        ServiceSubscriber{
 
     public static final String TAG = TrackPlayerDialogFragment.class.getSimpleName();
     public static final String LOG_TAG = TrackPlayerDialogFragment.class.getSimpleName();
@@ -85,9 +91,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
     };
 
-
-
-
     // A service connection to connect to the spotify api service.
     public ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -102,6 +105,8 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
             spotifyPlayerService = null;
         }
     };
+
+
 
     public static TrackPlayerDialogFragment newInstance(){
         return new TrackPlayerDialogFragment();
@@ -125,7 +130,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if(spotifyPlayerService != null) return;
         // Initiate the service.
         Intent intent = new Intent(getActivity(), SpotifyPlayerService.class);
         getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
@@ -167,7 +171,8 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
         try {
             if(playerNotification == null){
-                buildNotification();
+                playerNotification = new SpotifyNotification(getActivity(),
+                        (SpotifyTrack) spotifyTrackList.get(trackIndex)).buildNotification();
             }
             NotificationManager nm = (NotificationManager) getActivity()
                     .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -193,30 +198,60 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
         nm.cancel(1);
     }
 
-    private void buildNotification(){
-        // Initiating the pending intents for playback controls.
-        PendingIntent playPendingIntent = initiateSpotifyPendingIntent(getActivity(), PLAY_ACTION);
-        PendingIntent previousPendingIntent = initiateSpotifyPendingIntent(getActivity(), PREVIOUS_ACTION);
-        PendingIntent nextPendingIntent = initiateSpotifyPendingIntent(getActivity(), NEXT_ACTION);
-
-        Notification.Builder builder = new Notification.Builder(getActivity());
-        RemoteViews notificationView =
-                new RemoteViews(getActivity().getPackageName(), R.layout.notification_player);
-
-        notificationView.setOnClickPendingIntent(R.id.notification_play_btn_img,
-                playPendingIntent);
-        notificationView.setOnClickPendingIntent(R.id.notification_prev_btn_img,
-                previousPendingIntent);
-        notificationView.setOnClickPendingIntent(R.id.notification_next_btn_img,
-                nextPendingIntent);
-
-        builder.setContent(notificationView)
-                .setSmallIcon(R.drawable.ic_skip_next_black_24dp)
-                .setOngoing(true)
-                .setTicker(SPOTIFY_STREAMER_TICKER);
-
-        playerNotification = builder.build();
-    }
+//    private void buildNotification(){
+//        // Initiating the pending intents for playback controls.
+//        PendingIntent playPendingIntent = initiateSpotifyPendingIntent(getActivity(), PLAY_ACTION);
+//        PendingIntent previousPendingIntent = initiateSpotifyPendingIntent(getActivity(), PREVIOUS_ACTION);
+//        PendingIntent nextPendingIntent = initiateSpotifyPendingIntent(getActivity(), NEXT_ACTION);
+//
+//        final SpotifyTrack track = (SpotifyTrack) spotifyTrackList.get(trackIndex);
+//        Notification.Builder builder = new Notification.Builder(getActivity());
+//
+//
+//        RemoteViews notificationView =
+//                new RemoteViews(getActivity().getPackageName(), R.layout.notification_player);
+//
+//        notificationView.setOnClickPendingIntent(R.id.notification_play_btn_img,
+//                playPendingIntent);
+//        notificationView.setOnClickPendingIntent(R.id.notification_prev_btn_img,
+//                previousPendingIntent);
+//        notificationView.setOnClickPendingIntent(R.id.notification_next_btn_img,
+//                nextPendingIntent);
+//
+//        notificationView.setTextViewText(R.id.notification_album_text, track.getAlbumName());
+//
+//        Bitmap image = null;
+//
+//        try {
+//            image = new AsyncTask<Void, Void, Bitmap>() {
+//                @Override
+//                protected Bitmap doInBackground(Void... params) {
+//                    try {
+//                        return Picasso.with(getActivity()).load(track.getImageUrl()).get();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    return null;
+//                }
+//            }.execute().get();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (image != null) {
+//            notificationView.setImageViewBitmap(R.id.notification_album_image, image);
+//            builder.setLargeIcon(image);
+//        }
+//        builder.setContent(notificationView)
+//                .setSmallIcon(R.drawable.ic_skip_next_black_24dp)
+//                .setOngoing(true)
+//                .setTicker(SPOTIFY_STREAMER_TICKER)
+//                .setContentTitle(track.getTrackName());
+//
+//
+//        playerNotification = builder.build();
+//        playerNotification.bigContentView = notificationView;
+//    }
 
     @Override
     public void onDestroy() {
@@ -240,44 +275,38 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
     }
 
-    private PendingIntent initiateSpotifyPendingIntent(Context context, String action){
-        Intent intent = new Intent(context, SpotifyPlayerService.class).setAction(
-                action);
-        PendingIntent pendingIntent = PendingIntent.getService(getActivity(), 0,
-                intent, 0);
-        return pendingIntent;
-    }
+//    private PendingIntent initiateSpotifyPendingIntent(Context context, String action){
+//        Intent intent = new Intent(context, SpotifyPlayerService.class).setAction(
+//                action);
+//        PendingIntent pendingIntent = PendingIntent.getService(getActivity(), 0,
+//                intent, 0);
+//        return pendingIntent;
+//    }
 
     @Override
     public void onClick(View v) {
         // If the fragment is clicked we check for the click we check for the click and
         // take action accordingly.
-        int trackIndex = -1;
+        if(spotifyPlayerService != null){
+            spotifyPlayerService.subscribe(this);
+        }
         switch (v.getId()) {
             case R.id.player_play_btn_img:
                 // If the play button is clicked.
                 Log.d(LOG_TAG, "Play button has been clicked.");
-                trackIndex = spotifyPlayerService.playButtonPressed();
+                spotifyPlayerService.playButtonPressed();
                 break;
 
             case R.id.player_next_btn_img:
                 // If the next button is clicked.
                 Log.d(LOG_TAG, "Next song button pressed.");
                 spotifyPlayerService.nextTrack();
-                trackIndex = spotifyPlayerService.nextTrack();
                 break;
 
             case R.id.player_prev_btn_img:
                 Log.d(LOG_TAG, "Previous song button pressed.");
                 spotifyPlayerService.previousTrack();
-                trackIndex = spotifyPlayerService.previousTrack();
                 break;
-        }
-
-        if(trackIndex != -1){
-            // If any button was clicked and track has chaned, we have to update the
-            // view objects accordingly.
-            playerViewHolder.setViewObjects(getView(),(SpotifyTrack) spotifyTrackList.get(trackIndex));
         }
 
     }
@@ -291,7 +320,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
         // If root view itself is null, we return null.
         if(rootView == null) return null;
-
 
         playerViewHolder = new PlayerViewHolder(rootView);
         rootView.setTag(playerViewHolder);
@@ -388,6 +416,14 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     }
 
 
+    @Override
+    public void stateChanged(SpotifyTrackComponent component) {
+        if(playerViewHolder != null) {
+            playerViewHolder.setViewObjects(getView(), component);
+        }
+    }
+
+
 
     static class PlayerViewHolder{
 
@@ -404,7 +440,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
             ButterKnife.inject(this, view);
         }
 
-        public void setViewObjects(View view, final SpotifyTrack spotifyTrack)
+        public void setViewObjects(View view, final SpotifyTrackComponent spotifyTrack)
         {
             if(albumNameTextView != null) albumNameTextView.setText(spotifyTrack.getAlbumName());
             if(artistNameTextView != null) artistNameTextView.setText(spotifyTrack.getArtistName());

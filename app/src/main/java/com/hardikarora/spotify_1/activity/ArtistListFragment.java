@@ -2,7 +2,6 @@ package com.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
@@ -22,10 +21,11 @@ import android.widget.Toast;
 import com.hardikarora.spotify_1.R;
 import com.hardikarora.spotify_1.adapter.SpotifyArtistListAdapter;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
+import com.hardikarora.spotify_1.service.ServiceSubscriber;
 import com.hardikarora.spotify_1.util.AsyncResponse;
 import com.hardikarora.spotify_1.util.SpotifyApiUtility;
 import com.hardikarora.spotify_1.util.SpotifyAsyncTask;
-import com.hardikarora.spotify_1.util.SpotifyPlayerService;
+import com.hardikarora.spotify_1.service.SpotifyPlayerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -294,6 +294,5 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
         public void onListItemSelected(String artistId, String imageUrl);
 
     }
-
 
 }

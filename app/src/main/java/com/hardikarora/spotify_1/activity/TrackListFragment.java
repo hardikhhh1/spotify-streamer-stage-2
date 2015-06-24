@@ -172,15 +172,16 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
                 if (getActivity().findViewById(R.id.top_tracks_container) != null
                         && getActivity().findViewById(R.id.container) != null){
                     trackPlayerDialogFragment.show(manager, "Spotify player");
-                    } else {
+                } else {
 
                     FragmentTransaction transaction = manager.beginTransaction();
                     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    transaction.replace(R.id.container, trackPlayerDialogFragment,
+                    transaction.replace(R.id.top_tracks_container, trackPlayerDialogFragment,
                             TrackPlayerDialogFragment.TAG)
+                            .addToBackStack(TrackPlayerDialogFragment.TAG)
                             .commit();
 
-                    }
+                }
 
             }
         });

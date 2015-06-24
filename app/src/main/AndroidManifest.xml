@@ -31,7 +31,7 @@
             android:label="@string/title_activity_song_play" >
         </activity>
 
-        <service android:name=".util.SpotifyPlayerService" />
+        <service android:name=".service.SpotifyPlayerService" />
 
         <activity
             android:name=".menu.PreferenceMenuActivity"

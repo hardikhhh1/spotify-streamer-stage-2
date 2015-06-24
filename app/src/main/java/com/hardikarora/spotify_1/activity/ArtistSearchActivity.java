@@ -1,8 +1,6 @@
 package com.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,7 +10,7 @@ import com.hardikarora.spotify_1.R;
 import com.hardikarora.spotify_1.menu.PreferenceMenuActivity;
 import com.hardikarora.spotify_1.model.SpotifyTrack;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import com.hardikarora.spotify_1.util.SpotifyPlayerService;
+import com.hardikarora.spotify_1.service.SpotifyPlayerService;
 
 import java.util.ArrayList;
 import java.util.List;
