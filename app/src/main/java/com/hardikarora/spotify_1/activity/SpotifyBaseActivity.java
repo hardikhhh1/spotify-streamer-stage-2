@@ -81,6 +81,7 @@ public class SpotifyBaseActivity extends Activity {
         super.onResume();
         if(spotifyNotification == null) return;
 
+
         // Cancelling the notification.
         spotifyNotification.cancelNotification();
     }
@@ -91,7 +92,8 @@ public class SpotifyBaseActivity extends Activity {
         super.onDestroy();
 
         // Canceling the notification.
-        if(spotifyNotification != null) spotifyNotification.cancelNotification();
+        if(spotifyNotification != null && TrackPlayerDialogFragment.spotifyPlayerService.getSpotifyPlayerState()
+                != SpotifyPlayerService.PlayerState.Play) spotifyNotification.cancelNotification();
 
     }
 

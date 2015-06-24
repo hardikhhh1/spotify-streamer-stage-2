@@ -178,16 +178,8 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
         return spotifyPlayerState;
     }
 
-    public static void setSpotifyPlayerState(PlayerState spotifyPlayerState) {
-        SpotifyPlayerService.spotifyPlayerState = spotifyPlayerState;
-    }
-
     public static MediaPlayer getPlayer() {
         return player;
-    }
-
-    public static void setPlayer(MediaPlayer player) {
-        SpotifyPlayerService.player = player;
     }
 
     @Override
