@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.hardikarora.spotify_1.activity.TrackListFragment;
 import com.hardikarora.spotify_1.activity.TrackPlayerDialogFragment;
+import com.hardikarora.spotify_1.menu.SpotifyNotification;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 
 import java.io.IOException;
@@ -59,11 +60,11 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
         String action = intent.getAction();
         if(action == null) return super.onStartCommand(intent, flags, startId);
 
-        if(action.equals(TrackPlayerDialogFragment.PLAY_ACTION)){
+        if(action.equals(SpotifyNotification.PLAY_ACTION)){
             playButtonPressed();
-        }else if(action.equals(TrackPlayerDialogFragment.NEXT_ACTION)){
+        }else if(action.equals(SpotifyNotification.NEXT_ACTION)){
             nextTrack();
-        }else if(action.equals(TrackPlayerDialogFragment.PREVIOUS_ACTION)){
+        }else if(action.equals(SpotifyNotification.PREVIOUS_ACTION)){
             previousTrack();
         }
 

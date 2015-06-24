@@ -23,6 +23,7 @@ import java.io.IOException;
  */
 public class SpotifyNotification implements ServiceSubscriber {
 
+    public static final int NOTIFICATION_ID = 1;
     SpotifyPlayerService service = new SpotifyPlayerService().getInstance();
 
     public static final String PLAY_ACTION = "Play";
@@ -57,7 +58,23 @@ public class SpotifyNotification implements ServiceSubscriber {
 
     }
 
+    public void startNotification(){
+        if(track == null) return;
+        NotificationManager nm = (NotificationManager) mContext
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification notification = buildNotification();
+        nm.notify(NOTIFICATION_ID, notification);
+    }
+
+    public void cancelNotification(){
+        NotificationManager nm = (NotificationManager) mContext
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(NOTIFICATION_ID);
+    }
+
+
     public Notification buildNotification(){
+        if(track == null) return null;
         return buildNotification(track.getTrackName(), track.getImageUrl());
     }
 

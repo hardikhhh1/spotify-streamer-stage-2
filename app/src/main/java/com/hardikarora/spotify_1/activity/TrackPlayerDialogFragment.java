@@ -59,10 +59,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     public static final String TAG = TrackPlayerDialogFragment.class.getSimpleName();
     public static final String LOG_TAG = TrackPlayerDialogFragment.class.getSimpleName();
     public static final String TRACK_SUBJECT_MESSAGE = "A great song indeed !!";
-    public static final String PLAY_ACTION = "Play";
-    public static final String NEXT_ACTION = "Next";
-    public static final String PREVIOUS_ACTION = "Previous";
-    public static final String SPOTIFY_STREAMER_TICKER = "Spotify Streamer";
     public static final String PLAYER_PREFERENCE = "playerPreference";
     public static final String PLAYER_PREFERENCE_KEY = PLAYER_PREFERENCE;
 
@@ -75,13 +71,12 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     TextView playerEndTime;
     SpotifyPlayerService spotifyPlayerService;
     Handler seekHandler = new Handler();
+    SpotifyNotification spotifyNotification;
 
     List<SpotifyTrackComponent> spotifyTrackList; // List of spotify tracks.
     int trackIndex;
 
     private BroadcastReceiver playerReciever;
-    Notification playerNotification;
-
 
     Runnable run = new Runnable() {
         @Override
@@ -105,8 +100,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
             spotifyPlayerService = null;
         }
     };
-
-
 
     public static TrackPlayerDialogFragment newInstance(){
         return new TrackPlayerDialogFragment();
@@ -169,14 +162,13 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
         if(!notificationPreference) return;
 
+
         try {
-            if(playerNotification == null){
-                playerNotification = new SpotifyNotification(getActivity(),
-                        (SpotifyTrack) spotifyTrackList.get(trackIndex)).buildNotification();
+            if(spotifyNotification == null){
+                 spotifyNotification= new SpotifyNotification(getActivity(),
+                        (SpotifyTrack) spotifyTrackList.get(trackIndex));
+                 spotifyNotification.startNotification();
             }
-            NotificationManager nm = (NotificationManager) getActivity()
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-            nm.notify(1, playerNotification);
         }
         catch (Exception e){
             Log.e(LOG_TAG,  "Error while getting log for the player." + e.getMessage() +
@@ -190,68 +182,12 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     public void onResume() {
         super.onResume();
         Log.d(LOG_TAG, "On resume for player fragment called");
-        if(playerNotification == null) return;
+        if(spotifyNotification == null) return;
 
         // Cancelling the notification.
-        NotificationManager nm = (NotificationManager) getActivity()
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.cancel(1);
+        spotifyNotification.cancelNotification();
     }
 
-//    private void buildNotification(){
-//        // Initiating the pending intents for playback controls.
-//        PendingIntent playPendingIntent = initiateSpotifyPendingIntent(getActivity(), PLAY_ACTION);
-//        PendingIntent previousPendingIntent = initiateSpotifyPendingIntent(getActivity(), PREVIOUS_ACTION);
-//        PendingIntent nextPendingIntent = initiateSpotifyPendingIntent(getActivity(), NEXT_ACTION);
-//
-//        final SpotifyTrack track = (SpotifyTrack) spotifyTrackList.get(trackIndex);
-//        Notification.Builder builder = new Notification.Builder(getActivity());
-//
-//
-//        RemoteViews notificationView =
-//                new RemoteViews(getActivity().getPackageName(), R.layout.notification_player);
-//
-//        notificationView.setOnClickPendingIntent(R.id.notification_play_btn_img,
-//                playPendingIntent);
-//        notificationView.setOnClickPendingIntent(R.id.notification_prev_btn_img,
-//                previousPendingIntent);
-//        notificationView.setOnClickPendingIntent(R.id.notification_next_btn_img,
-//                nextPendingIntent);
-//
-//        notificationView.setTextViewText(R.id.notification_album_text, track.getAlbumName());
-//
-//        Bitmap image = null;
-//
-//        try {
-//            image = new AsyncTask<Void, Void, Bitmap>() {
-//                @Override
-//                protected Bitmap doInBackground(Void... params) {
-//                    try {
-//                        return Picasso.with(getActivity()).load(track.getImageUrl()).get();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return null;
-//                }
-//            }.execute().get();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        if (image != null) {
-//            notificationView.setImageViewBitmap(R.id.notification_album_image, image);
-//            builder.setLargeIcon(image);
-//        }
-//        builder.setContent(notificationView)
-//                .setSmallIcon(R.drawable.ic_skip_next_black_24dp)
-//                .setOngoing(true)
-//                .setTicker(SPOTIFY_STREAMER_TICKER)
-//                .setContentTitle(track.getTrackName());
-//
-//
-//        playerNotification = builder.build();
-//        playerNotification.bigContentView = notificationView;
-//    }
 
     @Override
     public void onDestroy() {
@@ -259,11 +195,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
         Log.d(LOG_TAG, "On destroy for player fragment called");
 
         // Canceling the notification.
-        if(playerNotification != null) {
-            NotificationManager nm = (NotificationManager) getActivity()
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-            nm.cancel(1);
-        }
+        if(spotifyNotification != null) spotifyNotification.cancelNotification();
 
         // Unregistering the reciever.
         getActivity().unregisterReceiver(this.playerReciever);
@@ -275,13 +207,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
     }
 
-//    private PendingIntent initiateSpotifyPendingIntent(Context context, String action){
-//        Intent intent = new Intent(context, SpotifyPlayerService.class).setAction(
-//                action);
-//        PendingIntent pendingIntent = PendingIntent.getService(getActivity(), 0,
-//                intent, 0);
-//        return pendingIntent;
-//    }
 
     @Override
     public void onClick(View v) {
