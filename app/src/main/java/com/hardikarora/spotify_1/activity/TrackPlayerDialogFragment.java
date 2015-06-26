@@ -185,6 +185,12 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
                 spotifyPlayerService.playButtonPressed();
                 break;
 
+            case R.id.player_pause_btn_img:
+                // If the next button is clicked.
+                Log.d(LOG_TAG, "Pause song button pressed.");
+                spotifyPlayerService.pauseTrack();
+                break;
+
             case R.id.player_next_btn_img:
                 // If the next button is clicked.
                 Log.d(LOG_TAG, "Next song button pressed.");
@@ -214,6 +220,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
         //Setting itself as an on click listener for various play back controls.
         setOnClickForImage(playerViewHolder.playButtonImage);
+        setOnClickForImage(playerViewHolder.pauseButtonImage);
         setOnClickForImage(playerViewHolder.previousButtonImage);
         setOnClickForImage( playerViewHolder.nextButtonImage);
 
@@ -316,6 +323,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     static class PlayerViewHolder{
 
         @InjectView(R.id.player_play_btn_img) ImageView playButtonImage;
+        @InjectView(R.id.player_pause_btn_img) ImageView pauseButtonImage;
         @InjectView(R.id.player_next_btn_img) ImageView nextButtonImage;
         @InjectView(R.id.player_prev_btn_img) ImageView previousButtonImage;
         @InjectView(R.id.player_album_image) ImageView albumImageView;

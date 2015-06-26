@@ -64,24 +64,49 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     }
 
     public void playButtonPressed(){
-
+        Log.d(LOG_TAG, "Play button has been pressed");
         if(spotifyPlayerState == PlayerState.Play){
-            if(spotifyTrackList.get(trackIndex) == nowPlayingSpotifyTrack){
+            Log.d(LOG_TAG, "Previos State : PLAY");
+            if(spotifyTrackList.get(trackIndex).getTrackUrl().equals(
+                    nowPlayingSpotifyTrack.getTrackUrl())){
+                Log.d(LOG_TAG, "Play button has been pressed for the same track, it should pause");
                 player.pause();
                 spotifyPlayerState = PlayerState.Paused;
+                return;
             }
-            previousTrackIndex = trackIndex;
-
-
+            else{
+                Log.d(LOG_TAG, "Play button has been pressed for different track, it play different track");
+                resetAndPlayTrack();
+                updateStateChanged();
+            }
         } else if(spotifyPlayerState == PlayerState.Paused){
-            if(spotifyTrackList.get(trackIndex) == nowPlayingSpotifyTrack) {
+            Log.d(LOG_TAG, "Previos State : PAUSE");
+
+            if(spotifyTrackList.get(trackIndex).getTrackUrl().equals(
+                    nowPlayingSpotifyTrack.getTrackUrl())){
+                Log.d(LOG_TAG, "Play button has been pressed for the same track, it should play again");
                 player.start();
                 spotifyPlayerState = PlayerState.Play;
+                return;
+            } else{
+                Log.d(LOG_TAG, "Play button has been pressed for the different track, it should play different track");
+                player.pause();
+                resetAndPlayTrack();
+                updateStateChanged();
             }
+        } else{
+            playTrack(spotifyTrackList.get(trackIndex).getTrackUrl());
+            updateStateChanged();
         }
 
-        resetAndPlayTrack();
-        updateStateChanged();
+    }
+
+    public void pauseTrack(){
+        if(player.isPlaying()){
+            player.pause();
+            spotifyPlayerState = PlayerState.Paused;
+            return;
+        }
     }
 
     public void nextTrack(){
@@ -117,12 +142,18 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
 
     private void resetAndPlayTrack(){
         String spotifyTrackUrl = spotifyTrackList.get(trackIndex).getTrackUrl();
-        player.stop();
+        if(player.isPlaying()) {
+            player.stop();
+        }
         player.reset();
         playTrack(spotifyTrackUrl);
+        return;
     }
 
     private void playTrack(String spotifyTrackUrl){
+        if(player.isPlaying()){
+            player.reset();
+        }
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
             player.setDataSource(spotifyTrackUrl);
@@ -132,12 +163,15 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
         }
         nowPlayingSpotifyTrack = spotifyTrackList.get(trackIndex);
         player.prepareAsync();
+        return;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        player = new MediaPlayer();
+        if(player == null) {
+            player = new MediaPlayer();
+        }
         player.setOnPreparedListener(this);
         player.setOnCompletionListener(this);
         player.setOnErrorListener(this);
@@ -158,7 +192,7 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     public boolean onError(MediaPlayer mp, int what, int extra) {
         Log.e(LOG_TAG, "Error occured with the media player.");
         mp.reset();
-        return false;
+        return true;
     }
 
     @Override

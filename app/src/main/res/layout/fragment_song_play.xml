@@ -84,6 +84,17 @@
                 android:contentDescription="Previous Track"
                 android:layout_weight="1" />
 
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_media_pause"
+                android:id="@+id/player_pause_btn_img"
+                android:contentDescription="Pause Track"
+                android:layout_weight="1" />
+
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -92,6 +103,8 @@
                 android:id="@+id/player_play_btn_img"
                 android:contentDescription="Play Track"
                 android:layout_weight="1" />
+
+
 
             <ImageView
                 android:layout_width="wrap_content"
