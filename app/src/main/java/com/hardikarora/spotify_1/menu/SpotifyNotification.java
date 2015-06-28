@@ -21,6 +21,7 @@ import java.io.IOException;
 
 /**
  * Created by hardikarora on 6/23/15.
+ * Class representing the notification player.
  */
 public class SpotifyNotification implements ServiceSubscriber {
 
@@ -28,6 +29,7 @@ public class SpotifyNotification implements ServiceSubscriber {
     public static final String PLAY_ACTION = "Play";
     public static final String NEXT_ACTION = "Next";
     public static final String PREVIOUS_ACTION = "Previous";
+    public static final String PAUSE_ACTION = "Pause";
 
     private static final String SPOTIFY_STREAMER_TICKER = "Spotify Streamer";
     private Context mContext;
@@ -53,7 +55,7 @@ public class SpotifyNotification implements ServiceSubscriber {
             );
             NotificationManager nm = (NotificationManager) mContext
                     .getSystemService(Context.NOTIFICATION_SERVICE);
-            nm.notify(1, notification);
+            nm.notify(NOTIFICATION_ID, notification);
 
         }
 
@@ -83,6 +85,7 @@ public class SpotifyNotification implements ServiceSubscriber {
         PendingIntent playPendingIntent = initiateSpotifyPendingIntent(mContext, PLAY_ACTION);
         PendingIntent previousPendingIntent = initiateSpotifyPendingIntent(mContext, PREVIOUS_ACTION);
         PendingIntent nextPendingIntent = initiateSpotifyPendingIntent(mContext, NEXT_ACTION);
+        PendingIntent pausePendingIntent = initiateSpotifyPendingIntent(mContext, PAUSE_ACTION);
 
         Notification.Builder builder = new Notification.Builder(mContext);
 
@@ -92,6 +95,8 @@ public class SpotifyNotification implements ServiceSubscriber {
 
         notificationView.setOnClickPendingIntent(R.id.notification_play_btn_img,
                 playPendingIntent);
+        notificationView.setOnClickPendingIntent(R.id.notification_pause_btn_img,
+                pausePendingIntent);
         notificationView.setOnClickPendingIntent(R.id.notification_prev_btn_img,
                 previousPendingIntent);
         notificationView.setOnClickPendingIntent(R.id.notification_next_btn_img,

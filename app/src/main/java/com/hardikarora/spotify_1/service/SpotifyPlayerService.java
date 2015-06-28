@@ -38,12 +38,20 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     public static List<SpotifyTrackComponent> spotifyTrackList;
     public static SpotifyTrackComponent nowPlayingSpotifyTrack;
     public static int trackIndex;
-    public int previousTrackIndex;
-
     private final IBinder mBinder = new SpotifyBinder();
 
     private static final String LOG_TAG = SpotifyPlayerService.class.getSimpleName();
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // When the service is destroyed we release the player.
+        if(player.isPlaying()){
+            player.stop();
+        }
+        player.release();
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -58,6 +66,8 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
             nextTrack();
         }else if(action.equals(SpotifyNotification.PREVIOUS_ACTION)){
             previousTrack();
+        }else if(action.equals(SpotifyNotification.PAUSE_ACTION)){
+            pauseTrack();
         }
 
         return super.onStartCommand(intent, flags, startId);
@@ -110,7 +120,7 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     }
 
     public void nextTrack(){
-
+        Log.d(LOG_TAG, "Playing next track now");
         trackIndex = (trackIndex + 1) % spotifyTrackList.size();
 
         // If the player is stopped we just change the track index, but
@@ -126,8 +136,9 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
 
     public void previousTrack(){
         if(trackIndex == 0){
-            trackIndex = spotifyTrackList.size();
+            trackIndex = spotifyTrackList.size() ;
         }
+        trackIndex -= 1;
 
         // If the player is stopped we just change the track index, but
         // don't play the music.
@@ -198,18 +209,12 @@ public class SpotifyPlayerService extends Service implements MediaPlayer.OnPrepa
     @Override
     public void onCompletion(MediaPlayer mp) {
         Log.d(LOG_TAG, "On completion has been called as the song has finished.");
-        Intent songFinishedIntent = new Intent(SONG_FINISHED_EVENT);
-        songFinishedIntent.putExtra(TrackListFragment.TRACK_INDEX_TAG, trackIndex + 1);
-        sendBroadcast(songFinishedIntent);
+        updateStateChanged();
         nextTrack();
     }
 
     public class SpotifyBinder extends Binder{
         public SpotifyPlayerService getService(){ return SpotifyPlayerService.this; }
-    }
-
-    public static PlayerState getSpotifyPlayerState() {
-        return spotifyPlayerState;
     }
 
     public static MediaPlayer getPlayer() {

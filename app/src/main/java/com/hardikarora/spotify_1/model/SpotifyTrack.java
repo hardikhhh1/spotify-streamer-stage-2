@@ -15,6 +15,7 @@ import kaaes.spotify.webapi.android.models.Track;
 public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
 
     public static final int DEFAULT_IMAGE_SIZE = 200;
+    public static final String SPOTIFY_KEY = "spotify";
 
     private String trackName;
     private String albumName;
@@ -22,22 +23,24 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
     private String imageUrl;
     private String trackId;
     private String trackUrl;
+    private String externalTrackUrl;
 
     public SpotifyTrack(String albumName, String trackName,  String artistName, String imageUrl,
-                        String trackId, String trackUrl) {
+                        String trackId, String trackUrl, String externalTrackUrl) {
         this.setAlbumName(albumName);
         this.setTrackName(trackName);
         this.setImageUrl(imageUrl);
         this.setTrackId(trackId);
         this.setTrackUrl(trackUrl);
         this.setArtistName(artistName);
+        this.setExternalTrackUrl(externalTrackUrl);
     }
 
 
     public SpotifyTrack(Track spotifyTrack, String artistName, int imageSize) {
         this(spotifyTrack.album.name, spotifyTrack.name, artistName,
                 new SpotifyApiUtility(null).findImageUrl(spotifyTrack.album.images, imageSize),
-                spotifyTrack.id, spotifyTrack.preview_url);
+                spotifyTrack.id, spotifyTrack.preview_url, spotifyTrack.external_urls.get(SPOTIFY_KEY));
     }
 
 
@@ -53,6 +56,7 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
         dest.writeString(this.imageUrl);
         dest.writeString(this.trackId);
         dest.writeString(this.trackUrl);
+        dest.writeString(this.externalTrackUrl);
     }
 
     public static final Creator CREATOR = new Creator() {
@@ -60,7 +64,7 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
         public SpotifyTrack createFromParcel(Parcel source) {
             return new SpotifyTrack(source.readString(), source.readString(),
                     source.readString(), source.readString(), source.readString(),
-                    source.readString());
+                    source.readString(), source.readString());
         }
 
         @Override
@@ -92,5 +96,9 @@ public class SpotifyTrack extends SpotifyTrackComponent implements Parcelable {
     public String getImageUrl() { return imageUrl; }
 
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public void setExternalTrackUrl(String externalTrackUrl) { this.externalTrackUrl = externalTrackUrl; }
+
+    public String getExternalTrackUrl() { return this.externalTrackUrl; }
 
 }

@@ -27,7 +27,7 @@
                 android:value=".activity.ArtistSearchActivity"/>
         </activity>
         <activity
-            android:name=".activity.SongPlayActivity"
+            android:name=".activity.SongPlayerActivity"
             android:label="@string/title_activity_song_play" >
         </activity>
 

@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hardikarora.spotify_1.R;
-import com.hardikarora.spotify_1.model.SpotifyTrack;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import com.squareup.picasso.Picasso;
 

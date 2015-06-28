@@ -35,8 +35,6 @@ public class SpotifyApiUtility{
     private static final String TYPE_TOKEN = "type";
     private static final String ARTIST_TOKEN = "artist";
     private static final String COUNTRY_TOKEN = "country";
-    //TODO: check to see where and how to use market token.
-    private static final String MARKET_TOKEN = "market";
     private static final String USA_SYMBOL = "US";
     private static final String EMPTY_PIC_LINK =
             "http://www.cloudcomputing-news.net/media/cloud_question_mark.jpg.600x600_q96.png";
@@ -56,7 +54,6 @@ public class SpotifyApiUtility{
         SpotifyApi spotifyApi = new SpotifyApi();
         SpotifyService spotifyService = spotifyApi.getService();
         Map<String, Object> apiOptions = new HashMap<>();
-        apiOptions.put(COUNTRY_TOKEN, getCountryCode());
         apiOptions.put(TYPE_TOKEN, ARTIST_TOKEN);
 
         ArtistsPager artists = spotifyService.searchArtists(artistName, apiOptions);
@@ -96,7 +93,7 @@ public class SpotifyApiUtility{
         String artistName = "";
         if(tracks.tracks.size() > 0){
             for(Track track : tracks.tracks){
-                if(artistName.equals("")){
+                if(artistName.isEmpty()){
                     List<ArtistSimple> artistList = track.artists;
                     for(ArtistSimple artist : artistList){
                         if(artistID.equals(artist.id)){
@@ -120,18 +117,16 @@ public class SpotifyApiUtility{
 
         for(Image image : imagesList){
             if(image.width == size){
-                Log.d(LOG_TAG, "The image size is width : " + image.width);
                 return image.url;
             }
         }
-        Log.d(LOG_TAG, "The image size is width : " + imagesList.get(0).width);
         return imagesList.get(0).url;
     }
 
     private String getCountryCode(){
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         String countryToken = preferences.getString("countryCode", USA_SYMBOL);
-        return USA_SYMBOL;
+        return countryToken;
     }
 
 

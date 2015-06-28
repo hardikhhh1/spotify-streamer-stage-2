@@ -37,4 +37,8 @@ public abstract class SpotifyTrackComponent {
 
     public void setTrackUrl(String trackUrl) { throw new UnsupportedOperationException(); }
 
+    public void setExternalTrackUrl(String externalTrackUrl) { throw new UnsupportedOperationException(); }
+
+    public String getExternalTrackUrl() { throw new UnsupportedOperationException(); }
+
 }

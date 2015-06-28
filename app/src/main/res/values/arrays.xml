@@ -3,14 +3,31 @@
     <string-array name="country_codes">
         <item>US</item>
         <item>IN</item>
-        <item>Sintel</item>
-        <item>Tears of Steel</item>
+        <item>UK</item>
+        <item>SE</item>
+        <item>AD</item>
+        <item>AR</item>
+        <item>AT</item>
+        <item>AU</item>
+        <item>BE</item>
+        <item>BG</item>
+        <item>BO</item>
+        <item>BR</item>
+        <item>CA</item>
     </string-array>
-
     <string-array name="country_names">
-        <item>United States</item>
+        <item>United States</item>\
         <item>India</item>
+        <item>United Kingdom</item>
+        <item>Sweden</item>
+        <item>Andorra</item>
+        <item>Argentina</item>
+        <item>Austria</item>
+        <item>Australia</item>
+        <item>Belgium</item>
+        <item>Bulgaria</item>
+        <item>Bolivia</item>
+        <item>Brazil</item>
+        <item>Canada</item>
     </string-array>
-
-
 </resources>

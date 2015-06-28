@@ -1,16 +1,12 @@
 package com.hardikarora.spotify_1.activity;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -20,12 +16,11 @@ import android.widget.Toast;
 
 import com.hardikarora.spotify_1.R;
 import com.hardikarora.spotify_1.adapter.SpotifyArtistListAdapter;
+import com.hardikarora.spotify_1.base.SpotifyBaseFragment;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
-import com.hardikarora.spotify_1.service.ServiceSubscriber;
 import com.hardikarora.spotify_1.util.AsyncResponse;
 import com.hardikarora.spotify_1.util.SpotifyApiUtility;
 import com.hardikarora.spotify_1.util.SpotifyAsyncTask;
-import com.hardikarora.spotify_1.service.SpotifyPlayerService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +34,10 @@ import butterknife.InjectView;
  * Encapsulating the list retrieved by spotify and is displayed in a {@link android.widget.ListView}
  * layout.
  */
-public class ArtistListFragment extends Fragment implements AsyncResponse {
+public class ArtistListFragment extends SpotifyBaseFragment implements AsyncResponse {
 
     private static final String LOG_TAG = ArtistListFragment.class.getSimpleName();
 
-    public static final String TAG = ArtistListFragment.class.getSimpleName();
     public static final String NO_ALBUM_TOAST = "Couldn't find the artist, please try different name.";
     public static final String ARTISTS_TAG = "Artists";
     public static final String ARTIST_IMAGE_TEXT = "ArtistImage";
@@ -53,7 +47,6 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     FetchSpotifyArtistData fetchSpotifyData;
     AsyncResponse fetchResponse = this;
     SpotifyApiUtility utility;
-    MenuItem nowPlayingMenuItem;
 
     private Callbacks mCallbacks;
 
@@ -68,16 +61,6 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
         fetchSpotifyData = new FetchSpotifyArtistData(this);
     }
 
-    public static ArtistListFragment newInstance(){
-        return new ArtistListFragment();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -87,6 +70,7 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
         }
 
+        // Registering the call back activity.
         mCallbacks = (Callbacks) activity;
     }
 
@@ -94,38 +78,8 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     public void onDetach() {
         super.onDetach();
 
-        // Reset the active callbacks interface to the dummy implementation.
+        // Reset the active callbacks interface to null.
         mCallbacks = null;
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        nowPlayingMenuItem = menu.findItem(R.id.now_playing_button);
-        nowPlayingMenuItem.setVisible(false);
-        SpotifyPlayerService.PlayerState state = SpotifyPlayerService.spotifyPlayerState;
-
-        if(state == SpotifyPlayerService.PlayerState.Play){
-            nowPlayingMenuItem.setVisible(true);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Check if now playing button is needed.
-        if(nowPlayingMenuItem == null) return;
-        SpotifyPlayerService.PlayerState state = SpotifyPlayerService.spotifyPlayerState;
-        if(state == SpotifyPlayerService.PlayerState.Play){
-            nowPlayingMenuItem.setVisible(true);
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -228,9 +182,7 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
     public class ArtistTextSearchTextWatcher  implements TextWatcher{
 
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -255,9 +207,7 @@ public class ArtistListFragment extends Fragment implements AsyncResponse {
         }
 
         @Override
-        public void afterTextChanged(Editable s) {
-
-        }
+        public void afterTextChanged(Editable s) {}
     }
 
     /**

@@ -1,14 +1,12 @@
 package com.hardikarora.spotify_1.activity;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,6 +16,7 @@ import android.widget.Toast;
 
 import com.hardikarora.spotify_1.R;
 import com.hardikarora.spotify_1.adapter.SpotifyTrackListAdapter;
+import com.hardikarora.spotify_1.base.SpotifyBaseFragment;
 import com.hardikarora.spotify_1.model.SpotifyTrack;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import com.hardikarora.spotify_1.util.AsyncResponse;
@@ -37,13 +36,14 @@ import butterknife.InjectView;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TrackListFragment extends Fragment implements AsyncResponse {
+public class TrackListFragment extends SpotifyBaseFragment implements AsyncResponse {
 
     private static final String LOG_TAG =  TrackListFragment.class.getSimpleName();
 
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
     private static final String NO_TOP_TRACKS =  "Found no top tracks for the artist";
 
+    public static final String NOW_PLAYING_TAG =  "NowPlaying";
     public static final String TAG =  TrackListFragment.class.getSimpleName();
     public static final String TOP_TRACKS_TAG = "TopTracks";
     public static final String SPOTIFY_TRACK_ID_TAG = "SpotifyTrackId";
@@ -65,13 +65,10 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
     @InjectView(R.id.album_list_view) ListView topTracksListView;
     @InjectView(R.id.artist_main_image) ImageView artistImageView;
 
+
     public TrackListFragment() {
         topTracks = new ArrayList<>();
         fetchArtistTopTrackData = new FetchArtistTopTrackData(this);
-    }
-
-    public static TrackListFragment newInstance(){
-        return new TrackListFragment();
     }
 
     @Override
@@ -160,28 +157,25 @@ public class TrackListFragment extends Fragment implements AsyncResponse {
         topTracksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bundle bundle = new Bundle();
-                SpotifyTrackComponent selectedTrack = topTracks.get(position);
-                bundle.putParcelableArrayList(TRACK_LIST_TAG, (ArrayList<SpotifyTrack>)
+                Bundle arguments = new Bundle();
+                arguments.putParcelableArrayList(TRACK_LIST_TAG, (ArrayList<SpotifyTrack>)
                         (ArrayList<?>)topTracks);
-                bundle.putInt(TRACK_INDEX_TAG, position);
-                bundle.putString(SPOTIFY_TRACK_ID_TAG, selectedTrack.getTrackId());
-                FragmentManager manager = getFragmentManager();
-                TrackPlayerDialogFragment trackPlayerDialogFragment = new TrackPlayerDialogFragment();
-                trackPlayerDialogFragment.setArguments(bundle);
-                if (getActivity().findViewById(R.id.top_tracks_container) != null
-                        && getActivity().findViewById(R.id.container) != null){
-                    trackPlayerDialogFragment.show(manager, "Spotify player");
-                } else {
+                arguments.putInt(TRACK_INDEX_TAG, position);
+                arguments.putString(SPOTIFY_TRACK_ID_TAG, topTracks.get(position).getTrackId());
+                arguments.putBoolean(NOW_PLAYING_TAG, false);
 
-                    FragmentTransaction transaction = manager.beginTransaction();
-                    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                    transaction.replace(R.id.top_tracks_container, trackPlayerDialogFragment,
-                            TrackPlayerDialogFragment.TAG)
-                            .addToBackStack(TrackPlayerDialogFragment.TAG)
-                            .commit();
+                FragmentManager manager = getFragmentManager();
+                TrackPlayerDialogFragment fragment = new TrackPlayerDialogFragment();
+                if (ArtistSearchActivity.mTwoPane){
+                    fragment.setArguments(arguments);
+                    fragment.show(manager, SongPlayerActivity.SPOTIFY_PLAYER_TITLE);
+                }else{
+                    Intent songPlayIntent = new Intent(getActivity(), SongPlayerActivity.class);
+                    songPlayIntent.putExtras(arguments);
+                    startActivity(songPlayIntent);
 
                 }
+
 
             }
         });

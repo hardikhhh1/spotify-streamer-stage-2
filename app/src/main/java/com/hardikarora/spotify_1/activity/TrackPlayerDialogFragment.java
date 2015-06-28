@@ -2,23 +2,17 @@ package com.hardikarora.spotify_1.activity;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,20 +23,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
-import android.widget.RemoteViews;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.hardikarora.spotify_1.R;
 import com.hardikarora.spotify_1.menu.SpotifyNotification;
+import com.hardikarora.spotify_1.menu.SpotifyShareButton;
 import com.hardikarora.spotify_1.model.SpotifyTrack;
 import com.hardikarora.spotify_1.model.SpotifyTrackComponent;
 import com.hardikarora.spotify_1.service.ServiceSubscriber;
 import com.hardikarora.spotify_1.service.SpotifyPlayerService;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -51,19 +45,18 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 /**
- * A placeholder fragment containing a simple view.
+ * This class representas the dialog for the player, which can can be displayed as
+ * a dialog or an embedded fragment.
  */
 public class TrackPlayerDialogFragment extends DialogFragment implements View.OnClickListener,
         ServiceSubscriber{
 
     public static final String TAG = TrackPlayerDialogFragment.class.getSimpleName();
     public static final String LOG_TAG = TrackPlayerDialogFragment.class.getSimpleName();
-    public static final String TRACK_SUBJECT_MESSAGE = "A great song indeed !!";
-    public static final String PLAYER_PREFERENCE = "playerPreference";
-    public static final String PLAYER_PREFERENCE_KEY = PLAYER_PREFERENCE;
+
 
     private PlayerViewHolder playerViewHolder;
-    private ShareActionProvider mShareActionProvider;
+    private Boolean rotated;
 
     public static SpotifyPlayerService spotifyPlayerService;
 
@@ -77,6 +70,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     int trackIndex;
 
     private BroadcastReceiver playerReciever;
+    private Boolean nowPlayingButton;
 
     Runnable run = new Runnable() {
         @Override
@@ -87,23 +81,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     };
 
     // A service connection to connect to the spotify api service.
-    public ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            spotifyPlayerService = ((SpotifyPlayerService.SpotifyBinder)service).getService();
-            spotifyPlayerService.spotifyTrackList = spotifyTrackList;
-            spotifyPlayerService.trackIndex = trackIndex;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            spotifyPlayerService = null;
-        }
-    };
-
-    public static TrackPlayerDialogFragment newInstance(){
-        return new TrackPlayerDialogFragment();
-    }
+    public ServiceConnection connection;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -116,37 +94,58 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
         return dialog;
     }
 
-
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Setting the share intent for share button.
+        setHasOptionsMenu(true);
+
+        if(connection == null){
+            connection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder service) {
+                    // On service connected we initiate some spotify variables.
+                    spotifyPlayerService = ((SpotifyPlayerService.SpotifyBinder)service).getService();
+                    spotifyPlayerService.spotifyTrackList = spotifyTrackList;
+                    spotifyPlayerService.trackIndex = trackIndex;
+                    if(!nowPlayingButton) {
+                        // If the fragment has been opened on now playing button the track doesn't
+                        // have to start again.
+                        spotifyPlayerService.playButtonPressed();
+                    }
+                }
+
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    // On service disconnected the service is set to null and notification
+                    // is removed.
+                    spotifyPlayerService = null;
+                    if(spotifyNotification != null) spotifyNotification.cancelNotification();
+                }
+
+            };
+
+        }
+
         // Initiate the service.
         Intent intent = new Intent(getActivity(), SpotifyPlayerService.class);
         getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        getActivity().startService(intent);
-
+        if (spotifyPlayerService.spotifyPlayerState == SpotifyPlayerService.PlayerState.Stopped){
+            getActivity().startService(intent);
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem item = menu.findItem(R.id.menu_item_share);
-        if(item == null) return;
-        item.setVisible(true);
-        mShareActionProvider = (ShareActionProvider) item.getActionProvider();
-        if(mShareActionProvider == null) return;
-        //TODO: add a spotify as extra text.
-        Intent shareButtonIntent = new Intent(Intent.ACTION_SEND);
-        shareButtonIntent.setType("text/plain");
-        String shareString = spotifyTrackList.get(trackIndex).getTrackUrl();
-        shareButtonIntent.putExtra(Intent.EXTRA_SUBJECT, TRACK_SUBJECT_MESSAGE);
-        shareButtonIntent.putExtra(Intent.EXTRA_TEXT, shareString);
-        if(mShareActionProvider != null){
-            mShareActionProvider.setShareIntent(shareButtonIntent);
+        MenuItem menuItem = menu.findItem(R.id.now_playing_button);
+        if(menuItem != null){
+            menuItem.setVisible(false);
         }
 
+        String externalTrackUrl = spotifyTrackList.get(trackIndex).getExternalTrackUrl();
+        SpotifyShareButton button = new SpotifyShareButton(externalTrackUrl);
+        button.showShareButton(menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -157,17 +156,16 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
         super.onDestroy();
         Log.d(LOG_TAG, "On destroy for player fragment called");
 
+        getActivity().unbindService(connection);
         // Canceling the notification.
         if(spotifyNotification != null) spotifyNotification.cancelNotification();
 
-        // Unregistering the reciever.
-        getActivity().unregisterReceiver(this.playerReciever);
-
-        // Unbinding and clearing the service.
-        getActivity().unbindService(connection);
-        Intent intent = new Intent(getActivity(), SpotifyPlayerService.class);
-        getActivity().stopService(intent);
-
+        if(spotifyPlayerService.spotifyPlayerState != SpotifyPlayerService.PlayerState.Play) {
+            Log.d(LOG_TAG, "Unbinding the service");
+            // Unbinding and clearing the service.
+            Intent intent = new Intent(getActivity(), SpotifyPlayerService.class);
+            getActivity().stopService(intent);
+        }
     }
 
 
@@ -205,6 +203,26 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(TrackListFragment.NOW_PLAYING_TAG, true);
+
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        // If the saved instance is null, function is exited.
+        if(savedInstanceState == null) return;
+        rotated = savedInstanceState.getBoolean(TrackListFragment.NOW_PLAYING_TAG);
+
+        if(rotated == null) return;
+        if(rotated == true)
+            nowPlayingButton = true;
+
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -228,12 +246,10 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
         spotifyTrackList = (ArrayList<SpotifyTrackComponent>)(ArrayList<?>)
                 getArguments().getParcelableArrayList(TrackListFragment.TRACK_LIST_TAG);
         trackIndex = getArguments().getInt(TrackListFragment.TRACK_INDEX_TAG);
+        nowPlayingButton = getArguments().getBoolean(TrackListFragment.NOW_PLAYING_TAG);
 
         // Setting the view objects with respect to the track.
         playerViewHolder.setViewObjects(rootView, (SpotifyTrack) spotifyTrackList.get(trackIndex));
-
-        // Setting the share intent for share button.
-        setHasOptionsMenu(true);
 
         playerSeekBar = (SeekBar) rootView.findViewById(R.id.seek_bar);
         playerSeekBar.setVisibility(View.VISIBLE);
@@ -249,25 +265,23 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
 
         seekHandler.postDelayed(run, 1000);
 
-        initiateReciever();
-
-        getActivity().registerReceiver(this.playerReciever, new IntentFilter(SpotifyPlayerService.SONG_FINISHED_EVENT));
-
         return rootView;
     }
 
     public void getPlayerUpdate(){
         MediaPlayer mediaPlayer = SpotifyPlayerService.getPlayer();
-        if(mediaPlayer == null){
-            return;
+        if(mediaPlayer == null) return;
+        try {
+            if (mediaPlayer.isPlaying()) {
+                playerStartTime.setText(millisToString(mediaPlayer.getCurrentPosition()));
+                playerEndTime.setText(millisToString(mediaPlayer.getDuration()));
+                playerSeekBar.setMax(mediaPlayer.getDuration());
+                playerSeekBar.setProgress(mediaPlayer.getCurrentPosition());
+            }
+            seekHandler.postDelayed(run, 1000);
+        } catch (Exception e){
+            Log.e(LOG_TAG, "Error while getting update : " + e.getMessage());
         }
-        if (mediaPlayer.isPlaying()) {
-            playerStartTime.setText(millisToString(mediaPlayer.getCurrentPosition()));
-            playerEndTime.setText(millisToString(mediaPlayer.getDuration()));
-            playerSeekBar.setMax(mediaPlayer.getDuration());
-            playerSeekBar.setProgress(mediaPlayer.getCurrentPosition());
-        }
-        seekHandler.postDelayed(run, 1000);
     }
 
     private String millisToString(long millis){
@@ -283,27 +297,6 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
     }
 
 
-    private void initiateReciever(){
-        playerReciever = new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(LOG_TAG, "The track is over, playing next track.");
-                String action = intent.getAction();
-                if(action == null) return;
-
-                if(!action.equals(SpotifyPlayerService.SONG_FINISHED_EVENT )) return;
-
-                int serviceTrackIndex = intent.getIntExtra(TrackListFragment.TRACK_INDEX_TAG, -1);
-
-                if(serviceTrackIndex == -1) return;
-
-                trackIndex = serviceTrackIndex;
-                playerViewHolder.setViewObjects(getView(), (SpotifyTrack) spotifyTrackList.get(trackIndex));
-            }
-
-        };
-    }
 
     private void setOnClickForImage(ImageView image){
         if(image != null)
@@ -316,6 +309,7 @@ public class TrackPlayerDialogFragment extends DialogFragment implements View.On
         if(playerViewHolder != null) {
             playerViewHolder.setViewObjects(getView(), component);
         }
+
     }
 
 
